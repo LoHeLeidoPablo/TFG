@@ -192,6 +192,7 @@ public class IntfzRegistro extends JFrame {
 
     } else {
       mensajeEmergente(2);
+      existe = false;
     }
   }
 

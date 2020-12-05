@@ -1,5 +1,14 @@
 package Libreria;
 
+import com.mongodb.MongoClient;
+import com.mongodb.MongoClientURI;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoCursor;
+import com.mongodb.client.MongoDatabase;
+import static com.mongodb.client.model.Sorts.*;
+import static com.mongodb.client.model.Projections.*;
+import org.bson.Document;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
@@ -10,6 +19,14 @@ public class IntfzPrincipal extends JFrame implements Interfaz {
 
   MenuUsuario menuUsuario = new MenuUsuario();
   InfoLibro infoLibro = new InfoLibro();
+
+  MongoClientURI uri =
+      new MongoClientURI(
+          "mongodb+srv://PabloBibTFG:7Infantes@biblioteca.w5wrr.mongodb.net/LoHeLeidoDB?retryWrites=true&w=majority");
+
+  MongoClient mongoClient = new MongoClient(uri);
+  MongoDatabase DDBB = mongoClient.getDatabase("LoHeLeidoDB");
+  MongoCollection<Document> collecLibro = DDBB.getCollection("Libro");
 
   JLabel lblportada1 = new JLabel("Portada1: 164 * 256");
   JLabel lblportada2 = new JLabel("Portada2: 164 * 256");
@@ -46,12 +63,13 @@ public class IntfzPrincipal extends JFrame implements Interfaz {
   public void iniciar() {
     setTitle("¿Lo he leído?");
     getContentPane().setLayout(new GridLayout(1, 10));
-    MenuUsuario menuUsuario = new MenuUsuario(panel,  this);
+    MenuUsuario menuUsuario = new MenuUsuario(panel, this);
     PanelBusqueda panelBusqueda = new PanelBusqueda(panel);
     crearComponentes();
     panel.setLayout(null);
     irLibro(lblportada1);
     irLibro(lblTitulo1);
+    ultimosAgregados();
 
     lblportada1.setBounds(75, 100, 250, 467);
     lblportada2.setBounds(375, 100, lblportada1.getWidth(), lblportada1.getHeight());
@@ -107,6 +125,23 @@ public class IntfzPrincipal extends JFrame implements Interfaz {
       panel.add(jLabel);
       jLabel.setBorder(BorderFactory.createLineBorder(Color.black));
       jLabel.setHorizontalAlignment(SwingConstants.CENTER);
+    }
+  }
+
+  public void ultimosAgregados() {
+    MongoCursor<Document> documento =
+        collecLibro.find().sort(descending("f_registro")).projection(include("Titulo")).iterator();
+    int i = 1;
+    for (int j = 1; i <= 5; i++) {
+      while (documento.hasNext()) {
+        Document dock = documento.next();
+        System.out.println(dock.toJson());
+        System.out.println(dock.get("Titulo").toString());
+        jLabelA[j + 4].setText(dock.get("Titulo").toString());
+        System.out.println(jLabelA[j + 4].getText());
+        j++;
+        break;
+      }
     }
   }
 

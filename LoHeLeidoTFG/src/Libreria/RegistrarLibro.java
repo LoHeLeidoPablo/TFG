@@ -5,6 +5,7 @@ import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.toedter.calendar.JDateChooser;
+import static com.mongodb.client.model.Filters.eq;
 import org.bson.Document;
 
 import javax.swing.*;
@@ -53,7 +54,7 @@ public class RegistrarLibro extends JFrame {
   private JSpinner spNColeccion = new JSpinner(new SpinnerNumberModel(0, 0, 999, 1));
 
   private JCheckBox ch1 = new JCheckBox("Aventuras");
-  private JCheckBox ch2 = new JCheckBox("Autobiografica");
+  private JCheckBox ch2 = new JCheckBox("Autobiografía");
   private JCheckBox ch3 = new JCheckBox("Ciencia Ficcion");
   private JCheckBox ch4 = new JCheckBox("Fantasia");
   private JCheckBox ch5 = new JCheckBox("Historica");
@@ -225,8 +226,8 @@ public class RegistrarLibro extends JFrame {
   }
 
   public boolean existeLibro() {
-    // Document doc = collecLibros.find(equ("ISBN", txtISBN)).first();
     // TODO El metodo de abajo es ineficiente
+    //Document doc = collecLibros.find(eq("ISBN", txtISBN)).first();
     List<Document> consulta = collecLibros.find().into(new ArrayList<Document>());
     for (int i = 0; i < consulta.size(); i++) {
       Document usuario = consulta.get(i);

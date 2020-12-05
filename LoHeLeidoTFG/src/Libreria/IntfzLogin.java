@@ -4,6 +4,7 @@ import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import static com.mongodb.client.model.Filters.*;
 import org.bson.Document;
 
 import javax.swing.*;
@@ -142,6 +143,13 @@ public class IntfzLogin extends JFrame implements Interfaz {
           public void actionPerformed(ActionEvent e) {
             List<Document> consulta = collecAuth.find().into(new ArrayList<Document>());
             List<Document> etqUsuario = collecUsuario.find().into(new ArrayList<Document>());
+            // TODO
+            /* Document doc =
+            collecAuth
+                .find(
+                    and(eq("Nombre", txtUsuario.getText()), eq("Nombre", txtUsuario.getText())))
+                .first();*/
+
             for (int i = 0; i < consulta.size(); i++) {
               Document usuario = consulta.get(i);
               Document auth = consulta.get(i);

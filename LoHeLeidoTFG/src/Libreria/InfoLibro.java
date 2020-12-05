@@ -1,3 +1,4 @@
+
 package Libreria;
 
 import javax.swing.*;
@@ -22,7 +23,7 @@ public class InfoLibro extends JFrame implements Interfaz {
     JLabel lblGeneros = new JLabel("Genero");
 
     JCheckBox ch1 = new JCheckBox("Aventuras");
-    JCheckBox ch2 = new JCheckBox("Autobiografica");
+    JCheckBox ch2 = new JCheckBox("Autobiografía");
     JCheckBox ch3 = new JCheckBox("Ciencia Ficcion");
     JCheckBox ch4 = new JCheckBox("Fantasia");
     JCheckBox ch5 = new JCheckBox("Historica");
@@ -167,7 +168,6 @@ public class InfoLibro extends JFrame implements Interfaz {
         tabbed.setBounds(1050, 130, 350, 125);
         tabbed.addTab("Ficha Tecnica", panelTecnico);
         if (IntfzLogin.id_Usuario.equals("Invitado")) {
-            System.out.println(IntfzLogin.id_Usuario);
         } else {
             tabbed.addTab("Estado", panelEstado);
         }

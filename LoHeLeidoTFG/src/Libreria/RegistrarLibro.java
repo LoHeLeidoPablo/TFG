@@ -16,6 +16,7 @@ import java.io.File;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class RegistrarLibro extends JFrame {
   private static final long serialVersionUID = 1L;
@@ -72,6 +73,7 @@ public class RegistrarLibro extends JFrame {
   Font fuente = new Font(lblGeneros.getFont().getFamily(), Font.BOLD, 12);
   File archivo;
   JCheckBox[] jCheckBoxeA = {ch1, ch2, ch3, ch4, ch5, ch6, ch7, ch8, ch9, ch10, ch11, ch12};
+  boolean existe = false;
 
   JComponent[] jComponentA = {
     panelGenero,
@@ -184,16 +186,17 @@ public class RegistrarLibro extends JFrame {
       String saga = txtColeccion.getText();
       Integer tomo = (Integer) spNColeccion.getValue();
       Integer capitulos = (Integer) spCapitulos.getValue();
-      Date fpublicacion = new Date();
+      /* Date fpublicacion = new Date();
       Date f_publicacion =
           new Date(
               fpublicacion.getDate()
                   + "/"
                   + (fpublicacion.getMonth() + 1)
                   + "/"
-                  + (fpublicacion.getYear() + 1900));
+                  + (fpublicacion.getYear() + 1900));*/
+      Date f_publicacion = datePublicacion.getDate();
+      Date f_registroLibro = new Date();
       ArrayList<String> valoresCB = new ArrayList<String>();
-
       for (JCheckBox jCheckBox : jCheckBoxeA) {
         if (jCheckBox.isSelected()) {
           valoresCB.add(jCheckBox.getText());
@@ -202,6 +205,7 @@ public class RegistrarLibro extends JFrame {
       String resumen = txtASinopsis.getText();
 
       Document libro = new Document();
+      // libro.put("Portada", archivo);
       libro.put("ISBN", isbn);
       libro.put("Titulo", titulo);
       libro.put("Autor", autor);
@@ -211,15 +215,28 @@ public class RegistrarLibro extends JFrame {
       libro.put("f_publicacion", f_publicacion);
       libro.put("Generos", valoresCB);
       libro.put("Sinopsis", resumen);
-      //  libro.put("Portada", archivo);
+      libro.put("f_registro", f_registroLibro);
       collecLibros.insertOne(libro);
+      mensajeEmergente(1);
     } else {
-      mensajeEmergente("LibroExistente");
+      mensajeEmergente(2);
+      existe = false;
     }
   }
 
   public boolean existeLibro() {
-    return false;
+    // Document doc = collecLibros.find(equ("ISBN", txtISBN)).first();
+    // TODO El metodo de abajo es ineficiente
+    List<Document> consulta = collecLibros.find().into(new ArrayList<Document>());
+    for (int i = 0; i < consulta.size(); i++) {
+      Document usuario = consulta.get(i);
+      String ISBN = txtISBN.getText();
+      if (ISBN.equals(usuario.getString("ISBN"))) {
+        existe = true;
+        break;
+      }
+    }
+    return existe;
   }
 
   public void añadirComponentes(JComponent[] jComponentA) {
@@ -265,17 +282,17 @@ public class RegistrarLibro extends JFrame {
         });
   }
 
-  public void mensajeEmergente(String mensaje) {
-    switch (mensaje) {
-      case "RegistroCorrecto":
-        JOptionPane.showMessageDialog(
-            null,
-            "Libro añadido Correctamente",
-            "Registro Completado",
-            JOptionPane.INFORMATION_MESSAGE);
-      case "LibroExistente":
-        JOptionPane.showMessageDialog(
-            null, "Este Libro ya esta registrado", "Registro Fallido", JOptionPane.ERROR_MESSAGE);
+  public void mensajeEmergente(int mensaje) {
+
+    if (mensaje == 1) {
+      JOptionPane.showMessageDialog(
+          null,
+          "Libro añadido Correctamente",
+          "Registro Completado",
+          JOptionPane.INFORMATION_MESSAGE);
+    } else {
+      JOptionPane.showMessageDialog(
+          null, "Este Libro ya esta registrado", "Registro Fallido", JOptionPane.ERROR_MESSAGE);
     }
   }
 }

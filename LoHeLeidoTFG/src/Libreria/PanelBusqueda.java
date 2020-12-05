@@ -20,7 +20,7 @@ public class PanelBusqueda extends JFrame implements Interfaz {
   private JPanel[] jPanelA = {panelBusqueda};
   private JTextField[] jTextFieldA = {txtBusqueda};
   Font font = lblnewBook.getFont();
-  Libreria.RegistrarLibro registrarLibro = new Libreria.RegistrarLibro();
+  IntfzRegLibro intfzRegLibro = new IntfzRegLibro();
 
   public PanelBusqueda(JPanel jpanel) {
 
@@ -53,7 +53,7 @@ public class PanelBusqueda extends JFrame implements Interfaz {
           public void mouseClicked(MouseEvent e) {
             panelBusqueda.setVisible(false);
             dispose();
-            registrarLibro.iniciar();
+            intfzRegLibro.iniciar();
           }
 
           @Override

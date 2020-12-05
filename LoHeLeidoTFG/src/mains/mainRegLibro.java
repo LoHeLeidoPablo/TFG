@@ -1,10 +1,10 @@
 package mains;
 
-import Libreria.RegistrarLibro;
+import Libreria.IntfzRegLibro;
 
 public class mainRegLibro {
   public static void main(String[] args) {
-    RegistrarLibro ventana = new RegistrarLibro();
+    IntfzRegLibro ventana = new IntfzRegLibro();
     ventana.iniciar();
   }
 }

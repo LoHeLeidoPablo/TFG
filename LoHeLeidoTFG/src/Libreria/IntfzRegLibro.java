@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class RegistrarLibro extends JFrame {
+public class IntfzRegLibro extends JFrame {
   private static final long serialVersionUID = 1L;
 
   MongoClientURI uri =
@@ -101,7 +101,7 @@ public class RegistrarLibro extends JFrame {
     datePublicacion
   };
 
-  public RegistrarLibro() {
+  public IntfzRegLibro() {
     this.setResizable(false);
   }
 

@@ -10,7 +10,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -171,8 +170,7 @@ public class IntfzRegistro extends JFrame {
       String email = txtEmail.getText();
       String passwd = txtPassword.getText();
 
-      SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-      Date fechaRegistro = sdf.parse(sdf.format(new Date()));
+      Date fechaRegistro = new Date();
 
       Document auth = new Document();
       auth.put("Nombre", nameusu);
@@ -192,11 +190,12 @@ public class IntfzRegistro extends JFrame {
 
     } else {
       mensajeEmergente(2);
+      existe = false;
     }
   }
 
   public boolean existeUsuario() {
-    // Document doc = collecUsuario.find(equ("Email", txtEmail)).first();
+    // Document doc = collecUsuario.find(eq("Email", txtEmail.getText())).first();
     List<Document> consulta = collecUsuario.find().into(new ArrayList<Document>());
     for (int i = 0; i < consulta.size(); i++) {
       Document usuario = consulta.get(i);

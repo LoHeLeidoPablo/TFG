@@ -1,16 +1,32 @@
 package IntfzLibreria;
 
+import com.mongodb.MongoClient;
+import com.mongodb.MongoClientURI;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import org.bson.Document;
+
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 import java.awt.font.TextAttribute;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class IntfzLogin extends JFrame {
   public static String id_Usuario = "Invitado";
+
+  IntfzPrincipal intfzPrincipal = new IntfzPrincipal();
+
+  MongoClientURI uri =
+      new MongoClientURI(
+          "mongodb+srv://PabloBibTFG:7Infantes@biblioteca.w5wrr.mongodb.net/LoHeLeidoDB?retryWrites=true&w=majority");
+
+  MongoClient mongoClient = new MongoClient(uri);
+  MongoDatabase DDBB = mongoClient.getDatabase("LoHeLeidoDB");
+  MongoCollection<Document> collecAuth = DDBB.getCollection("Auth");
+  MongoCollection<Document> collecUsuario = DDBB.getCollection("usuario");
 
   JPanel panel = new JPanel();
 
@@ -50,6 +66,7 @@ public class IntfzLogin extends JFrame {
   public void iniciar() {
     setTitle("Iniciar Sesión - ¿Lo he leído?");
     getContentPane().setLayout(new GridLayout(1, 10));
+    existeUsuario();
     crearComponentes();
     panel.setLayout(null);
 
@@ -114,6 +131,56 @@ public class IntfzLogin extends JFrame {
     pack();
     setSize(300, 260);
     setVisible(true);
+  }
+
+  public void existeUsuario() {
+    btnLogIn.addActionListener(
+        new ActionListener() {
+          @Override
+          public void actionPerformed(ActionEvent e) {
+            List<Document> consulta = collecAuth.find().into(new ArrayList<Document>());
+            List<Document> etqUsuario = collecUsuario.find().into(new ArrayList<Document>());
+            // TODO
+            /* Document doc =
+            collecAuth
+                .find(
+                    and(eq("Nombre", txtUsuario.getText()), eq("Nombre", txtUsuario.getText())))
+                .first();*/
+
+            for (int i = 0; i < consulta.size(); i++) {
+              Document usuario = consulta.get(i);
+              Document auth = consulta.get(i);
+              String usu = txtUsuario.getText();
+              String passwd = txtPassword.getText();
+              if (usu.equals(auth.getString("Nombre"))
+                  | usu.equals(auth.getString("Email"))
+                      & passwd.equals(auth.getString("Contraseña"))) {
+                registrado = true;
+                break;
+              }
+            }
+            if (registrado == true) {
+              id_Usuario = txtUsuario.getText(); // Poco Eficiente
+              panel.setVisible(false);
+              dispose();
+              intfzPrincipal.iniciar();
+            } else {
+              JOptionPane.showMessageDialog(
+                  null,
+                  "Credenciales Incorrectas, por favor vuelve a intentarlo",
+                  "Advertencia",
+                  JOptionPane.ERROR_MESSAGE);
+            }
+          }
+        });
+    // TODO Pasar objeto Auth a objeto Usuario
+    /*
+    menuUsuario = new Libreria.MenuUsuario(intfzPrincipal.panel,intfzPrincipal.jFramePrincipal,null);
+       menuUsuario.repaint();
+       intfzPrincipal.panel.repaint();
+       intfzPrincipal.cerrarVentana();
+       intfzPrincipal.jFramePrincipal.setVisible(false);
+    intfzPrincipal.jFramePrincipal.disable();*/
   }
 
   public void crearComponentes() {

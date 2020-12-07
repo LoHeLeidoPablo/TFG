@@ -1,10 +1,30 @@
 package IntfzLibreria;
 
+import com.mongodb.MongoClient;
+import com.mongodb.MongoClientURI;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import static com.mongodb.client.model.Filters.*;
+import org.bson.Document;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 public class IntfzRegistro extends JFrame {
+
+  MongoClientURI uri =
+      new MongoClientURI(
+          "mongodb+srv://PabloBibTFG:7Infantes@biblioteca.w5wrr.mongodb.net/LoHeLeidoDB?retryWrites=true&w=majority");
+
+  MongoClient mongoClient = new MongoClient(uri);
+  MongoDatabase DDBB = mongoClient.getDatabase("LoHeLeidoDB");
+  MongoCollection<Document> collecAuth = DDBB.getCollection("Auth");
+  MongoCollection<Document> collecUsuario = DDBB.getCollection("usuario");
 
   IntfzLogin intfzLogin = new IntfzLogin();
 
@@ -118,6 +138,11 @@ public class IntfzRegistro extends JFrame {
               if (!txtEmail.getText().isEmpty()) {
                 if (txtPassword.getText().length() >= 2) {
                   if (contra1.equals(contra2)) {
+                    try {
+                      creacionUsuario();
+                    } catch (ParseException parseException) {
+                      parseException.printStackTrace();
+                    }
                   } else {
                     lblObPassword2.setVisible(true);
                   }
@@ -139,6 +164,52 @@ public class IntfzRegistro extends JFrame {
     pack();
     setSize(275, 385);
     setVisible(true);
+  }
+
+  public void creacionUsuario() throws ParseException {
+    if (existeUsuario() == false) {
+      String nameusu = txtUsuario.getText();
+      String email = txtEmail.getText();
+      String passwd = txtPassword.getText();
+
+      Date fechaRegistro = new Date();
+
+      Document auth = new Document();
+      auth.put("Nombre", nameusu);
+      auth.put("Email", email);
+      auth.put("Contraseña", passwd);
+      collecAuth.insertOne(auth);
+
+      Document usuario = new Document();
+      usuario.put("Nombre", nameusu);
+      usuario.put("Email", email);
+      usuario.put("fCreacionCuenta", fechaRegistro);
+      usuario.put("NPrestados", 0);
+      collecUsuario.insertOne(usuario);
+      mensajeEmergente(1);
+      panel.setVisible(false);
+      dispose();
+
+      intfzLogin.iniciar();
+
+    } else {
+      mensajeEmergente(2);
+      existe = false;
+    }
+  }
+
+  public boolean existeUsuario() {
+    // Document doc = collecUsuario.find(eq("Email", txtEmail.getText())).first();
+    List<Document> consulta = collecUsuario.find().into(new ArrayList<Document>());
+    for (int i = 0; i < consulta.size(); i++) {
+      Document usuario = consulta.get(i);
+      String email = txtEmail.getText();
+      if (email.equals(usuario.getString("Email"))) {
+        existe = true;
+        break;
+      }
+    }
+    return existe;
   }
 
   public void rescribirCampo(JTextField jTextField, JLabel jLabel) {

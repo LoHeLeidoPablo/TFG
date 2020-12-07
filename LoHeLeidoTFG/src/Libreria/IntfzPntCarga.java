@@ -1,8 +1,5 @@
 package Libreria;
 
-
-
-
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoCollection;
@@ -14,7 +11,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class IntfzInicio extends JFrame {
+public class IntfzPntCarga extends JFrame {
   private static final long serialVersionUID = 1L;
 
   IntfzPrincipal intfzPrincipal = new IntfzPrincipal();
@@ -34,7 +31,7 @@ public class IntfzInicio extends JFrame {
   Font fuentet = new Font("", 3, 40);
   Font fuentei = new Font("", 3, 25);
 
-  public IntfzInicio() {
+  public IntfzPntCarga() {
     this.setResizable(false);
     this.setUndecorated(true);
     this.setLocationRelativeTo(null);

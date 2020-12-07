@@ -3,7 +3,7 @@ package Libreria;
 import javax.swing.*;
 import java.awt.*;
 
-public class MiCuenta extends JFrame implements Interfaz {
+public class IntfzMiCuenta extends JFrame implements Interfaz {
   private static final long serialVersionUID = 1L;
 
   // JFrame jFrameCuenta = new JFrame();
@@ -84,7 +84,7 @@ public class MiCuenta extends JFrame implements Interfaz {
 
   JComponent[] jComponentA = {panelPrestamo, panelEstadisticas};
 
-  public MiCuenta() {
+  public IntfzMiCuenta() {
     this.setResizable(false);
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
   }
@@ -228,19 +228,10 @@ public class MiCuenta extends JFrame implements Interfaz {
       double vAR = ((((double) conteoAbandonado * 100) / conteoTotal) * 500) / 100;
       double vQG = ((((double) conteoQuiero * 100) / conteoTotal) * 500) / 100;
 
-      System.out.println(vLV);
-      System.out.println(vLA);
-      System.out.println(vAR);
-      System.out.println(vQG);
-
       valorLeyendoVerde = (int) Math.round(vLV);
-      System.out.println(valorLeyendoVerde);
       valorLeidoAzul = (int) Math.round(vLA);
-      System.out.println(valorLeidoAzul);
       valorAbandonadoRojo = (int) Math.round(vAR);
-      System.out.println(valorAbandonadoRojo);
       valorQuieroGris = (int) Math.round(vQG);
-      System.out.println(valorQuieroGris);
     }
 
     lblVerde.setBounds(30, 30, valorLeyendoVerde, 30);

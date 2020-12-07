@@ -1,10 +1,35 @@
 package Libreria;
 
+import com.mongodb.MongoClient;
+import com.mongodb.MongoClientURI;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoCursor;
+import com.mongodb.client.MongoDatabase;
+import org.bson.Document;
+
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.text.SimpleDateFormat;
+
+import static com.mongodb.client.model.Filters.*;
+import static com.mongodb.client.model.Projections.include;
+import static com.mongodb.client.model.Sorts.ascending;
+import static com.mongodb.client.model.Sorts.descending;
 
 public class InfoLibro extends JFrame implements Interfaz {
   private static final long serialVersionUID = 1L;
+
+  MongoClientURI uri =
+      new MongoClientURI(
+          "mongodb+srv://PabloBibTFG:7Infantes@biblioteca.w5wrr.mongodb.net/LoHeLeidoDB?retryWrites=true&w=majority");
+
+  MongoClient mongoClient = new MongoClient(uri);
+  MongoDatabase DDBB = mongoClient.getDatabase("LoHeLeidoDB");
+  MongoCollection<Document> collecLibro = DDBB.getCollection("Libro");
+
+  MongoCursor<Document> coleccion;
 
   JFrame jFrameLibro = new JFrame();
 
@@ -16,10 +41,11 @@ public class InfoLibro extends JFrame implements Interfaz {
   JTabbedPane tabbed = new JTabbedPane();
 
   JLabel lblPortada = new JLabel("Portada");
-  JLabel lblTitlo = new JLabel();
-  JLabel lblAutor = new JLabel();
-  JLabel lblResumen = new JLabel("Resumen");
+  JLabel lblTitlo = new JLabel("Titulo");
+  JLabel lblAutor = new JLabel("Autor");
   JLabel lblGeneros = new JLabel("Genero");
+  JLabel lblResumen = new JLabel("Resumen");
+  JTextArea txtASinopsis = new JTextArea(loreIpsum());
 
   JCheckBox ch1 = new JCheckBox("Aventuras");
   JCheckBox ch2 = new JCheckBox("Autobiografía");
@@ -34,11 +60,10 @@ public class InfoLibro extends JFrame implements Interfaz {
   JCheckBox ch11 = new JCheckBox("Comic/Manga");
   JCheckBox ch12 = new JCheckBox("Otros");
 
-  JLabel lblISBN = new JLabel("ISBN:");
+  JLabel lblISBN = new JLabel("ISBN: ");
   JLabel lblCapitulos = new JLabel("Capitulos:");
   JLabel lblColeccion = new JLabel("Saga: ");
-  JLabel lblNColeccion = new JLabel(" Tomo II");
-  JLabel lblPublicacion = new JLabel("Fecha Publicacion: 22-01-2020");
+  JLabel lblPublicacion = new JLabel("Fecha Publicacion: ");
 
   JLabel lblEstado = new JLabel("Estado:");
   JLabel lblVistos = new JLabel("Caps leídos:");
@@ -49,8 +74,7 @@ public class InfoLibro extends JFrame implements Interfaz {
   int valMaximio = 50;
   JSpinner spCapL = new JSpinner(new SpinnerNumberModel(0, 0, valMaximio, 1));
   JLabel lblCapTotales = new JLabel("/" + valMaximio);
-  String[] notas = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"};
-  JComboBox<String> cbNota = new JComboBox<String>(notas);
+  JSpinner spNota = new JSpinner(new SpinnerNumberModel(0.0, 0.0, 10.0, 0.1));
   JButton btnUpdate = new JButton("Actualizar");
 
   Font fTitulo = new Font("Console", Font.BOLD, 40);
@@ -58,32 +82,10 @@ public class InfoLibro extends JFrame implements Interfaz {
   Font fResumen = new Font("Console", Font.PLAIN, 20);
   Font fTResumen = new Font("Console", Font.PLAIN, 14);
 
-  JTextArea txtASinopsis =
-      new JTextArea(
-          "Criada por monjes en en un templo escondido, Yumeko ha sido entrenada para ocultar su naturaleza. "
-              + "Mitad zorro kitsune, mitad humana, su habilidad para transformarse, solo es compatible con su inclinacion por las travesuras. "
-              + "HAsta el dia en que su hogar es arrastrado por demonios del averno y se ve obligada a huir con el mayor "
-              + "tesoro del templo, una parte del antiguo pergamino sagrado. Kage Tatsumi es un misterioso samurai del Clan de la Sombra,"
-              + " un guerrero que ha recibido la orden de recuperar el pergamino a cualquier precio. Pero el destino pronto une a Tatsumi y Yumeko."
-              + " Con la promesa de guiarlo hasta el anhelado tesoro, Yumeko establece una peligrosa alianza que le ofrece su mejor esperanza de supervivencia."
-              + "Pero él busca lo que ella ha escondido, ¿y  si su engaño es descubierto?");
-
   JButton btnPrestamo = new JButton("Prestar");
 
-  String[] titulos = {
-    lblColeccion.getText() + " - Tomo 1",
-    lblColeccion.getText() + " - Tomo 2",
-    lblColeccion.getText() + " - Tomo 3",
-    lblColeccion.getText() + " - Tomo 4",
-    lblColeccion.getText() + " - Tomo 5",
-    lblColeccion.getText() + " - Tomo 1",
-    lblColeccion.getText() + " - Tomo 2",
-    lblColeccion.getText() + " - Tomo 3",
-    lblColeccion.getText() + " - Tomo 4",
-    lblColeccion.getText() + " - Tomo 5"
-  };
-
-  JList<String> listasecuelas = new JList<String>(titulos);
+  JList<String> listasecuelas = new JList<String>();
+  DefaultListModel dlm = new DefaultListModel();
   JScrollPane scrollPane = new JScrollPane(listasecuelas);
 
   JPanel[] jPanelA = {panel, panelGenero, panelTecnico, panelEstado, panelEntregas};
@@ -110,21 +112,17 @@ public class InfoLibro extends JFrame implements Interfaz {
   };
   JComponent[] jCompPtecnicoA = {lblISBN, lblCapitulos, lblColeccion, lblPublicacion};
   JComponent[] jCompPestadoA = {
-    lblEstado, lblVistos, lblNota, cbEstados, spCapL, lblCapTotales, cbNota, btnUpdate
+    lblEstado, lblVistos, lblNota, cbEstados, spCapL, lblCapTotales, spNota, btnUpdate
   };
 
   public InfoLibro() {
     this.setResizable(false);
   }
 
-  public void iniciar() {
-    if (lblTitlo == null) {
-      setTitle("Info Libro");
-    } else {
-      setTitle(lblTitlo.getText());
-    }
+  public void iniciar(Document docLibro) {
     getContentPane().setLayout(new GridLayout(1, 15));
     crearComponents();
+    if (docLibro != null) mostrarInfoLibro(docLibro);
 
     panel.setLayout(null);
     panelGenero.setLayout(null);
@@ -134,15 +132,15 @@ public class InfoLibro extends JFrame implements Interfaz {
 
     btnPrestamo.setBounds(12, 550, 329, 30);
     lblPortada.setBounds(10, 30, 329, 512);
-    lblTitlo.setBounds(350, 55, 500, 35);
-    lblAutor.setBounds(350, 105, 500, 35);
-    lblResumen.setBounds(350, 250, 100, 20);
+    lblTitlo.setBounds(350, 55, 500, 45);
+    lblAutor.setBounds(350, 115, 500, 35);
+    lblResumen.setBounds(350, 260, 100, 20);
 
     lblTitlo.setFont(fTitulo);
     lblAutor.setFont(fAutor);
     lblResumen.setFont(fResumen);
 
-    panelGenero.setBounds(350, 150, 575, 85);
+    panelGenero.setBounds(350, 160, 575, 85);
     lblGeneros.setBounds(256, 4, 52, 15);
 
     ch1.setBounds(5, 20, 134, 20);
@@ -158,7 +156,7 @@ public class InfoLibro extends JFrame implements Interfaz {
     ch11.setBounds(410, 40, 134, 20);
     ch12.setBounds(410, 60, 134, 20);
 
-    txtASinopsis.setBounds(350, 275, 1050, 305);
+    txtASinopsis.setBounds(350, 285, 950, 257);
     txtASinopsis.setLineWrap(true);
     txtASinopsis.setWrapStyleWord(true);
     txtASinopsis.setEditable(false);
@@ -168,7 +166,7 @@ public class InfoLibro extends JFrame implements Interfaz {
     lblPortada.setBorder(BorderFactory.createLineBorder(Color.black));
     panelGenero.setBorder(BorderFactory.createLineBorder(Color.darkGray));
 
-    tabbed.setBounds(1050, 130, 350, 125);
+    tabbed.setBounds(950, 135, 350, 125);
     tabbed.addTab("Ficha Tecnica", panelTecnico);
     if (IntfzLogin.id_Usuario.equals("Invitado")) {
     } else {
@@ -180,7 +178,6 @@ public class InfoLibro extends JFrame implements Interfaz {
     lblISBN.setBounds(10, 10, 420, 15);
     lblCapitulos.setBounds(10, 30, 420, 15);
     lblColeccion.setBounds(10, 50, 420, 15);
-    lblColeccion.setText(lblColeccion.getText() + lblNColeccion.getText());
     lblPublicacion.setBounds(10, 70, 420, 15);
 
     panelEstado.setBounds(panelTecnico.getBounds());
@@ -190,7 +187,7 @@ public class InfoLibro extends JFrame implements Interfaz {
     spCapL.setBounds(110, 40, 50, 20);
     lblCapTotales.setBounds(160, 40, 50, 20);
     lblNota.setBounds(10, 70, 50, 20);
-    cbNota.setBounds(60, 70, 50, 20);
+    spNota.setBounds(60, 70, 50, 20);
     btnUpdate.setBounds(210, 50, 125, 40);
 
     panelEntregas.setBounds(panelTecnico.getBounds());
@@ -205,8 +202,102 @@ public class InfoLibro extends JFrame implements Interfaz {
 
     // Empaquetado, tamaño y visualizazion
     pack();
-    setSize(1440, 650);
+    setSize(1350, 650);
     setVisible(true);
+  }
+
+  public void mostrarInfoLibro(Document libro) {
+    lblISBN.setText("ISBN: " + libro.getString("ISBN"));
+    lblTitlo.setText(libro.getString("Titulo"));
+
+    if (lblTitlo == null) {
+      setTitle("Info Libro");
+    } else {
+      setTitle(lblTitlo.getText());
+    }
+
+    lblAutor.setText(libro.getString("Autor"));
+    txtASinopsis.setText(libro.getString("Sinopsis"));
+    lblColeccion.setText("Saga: " + libro.getString("Saga") + "  " + libro.getInteger("Tomo"));
+    lblCapitulos.setText("Capitulos: " + libro.getInteger("Capitulos"));
+    SimpleDateFormat sdf = new SimpleDateFormat("dd - MMMM - yyyy");
+    lblPublicacion.setText("Fecha de Publicación: " + sdf.format(libro.getDate("f_publicacion")));
+    valMaximio = libro.getInteger("Capitulos");
+    spCapL.setModel(new SpinnerNumberModel(0, 0, valMaximio, 1));
+    lblCapTotales.setText("/" + valMaximio);
+    dlm.clear();
+    coleccion =
+        collecLibro
+            .find(eq("Saga", libro.getString("Saga")))
+            .sort(ascending("Tomo"))
+            .projection(include("Titulo", "Tomo"))
+            .iterator();
+    while (coleccion.hasNext()) {
+      Document libroColec = coleccion.next();
+      String collecNume =
+          "Libro " + libroColec.getInteger("Tomo") + ":  " + libroColec.getString("Titulo");
+      dlm.addElement(collecNume);
+    }
+    listasecuelas.setModel(dlm);
+
+    // TODO Cuanto más lo usas más tarda el proceso en ejecutarse
+
+    /*  listasecuelas.addMouseListener(
+    new MouseAdapter() {
+      public void mouseClicked(MouseEvent evt) {
+        listasecuelas = (JList) evt.getSource();
+        if (evt.getClickCount() == 2) {
+          int index = listasecuelas.locationToIndex(evt.getPoint());
+          int i = 0;
+          MongoCursor<Document> otroLibro =
+              collecLibro
+                  .find(eq("Saga", libro.getString("Saga")))
+                  .sort(ascending("Tomo"))
+                  .iterator();
+          while (otroLibro.hasNext()) {
+            Document libroColec = otroLibro.next();
+            if (i == index) {
+              mostrarInfoLibro(libroColec);
+              System.out.println("I = " + i);
+              System.out.println("Index = " + index);
+              break;
+            }
+            i++;
+          }
+        }
+        return;
+      }
+    });*/
+
+    listasecuelas.addMouseListener(
+        new MouseAdapter() {
+          public void mouseClicked(MouseEvent evt) {
+            listasecuelas = (JList) evt.getSource();
+            if (evt.getClickCount() == 2) {
+              int index = listasecuelas.locationToIndex(evt.getPoint());
+              int i = 0;
+              MongoCursor<Document> otroLibro =
+                  collecLibro
+                      .find(eq("Saga", libro.getString("Saga")))
+                      .sort(ascending("Tomo"))
+                      .iterator();
+              while (otroLibro.hasNext()) {
+                Document libroColec = otroLibro.next();
+                if (i == index) {
+                  dispose();
+                  iniciar(libroColec);
+                }
+                i++;
+              }
+            }
+          }
+        });
+  }
+
+  public String loreIpsum() {
+    return " Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris lacinia porttitor libero in commodo. Integer erat metus, condimentum ut mattis quis, pretium sit amet orci. Aenean faucibus eu lacus eget iaculis. Aenean placerat ultrices suscipit. Etiam venenatis nulla ut pharetra scelerisque. Suspendisse scelerisque efficitur elit, id consequat ex tempus at. Nam odio erat, gravida at ante in, pellentesque porttitor ante. Maecenas semper a turpis et euismod.\n"
+        + "\n"
+        + "Integer sed ultricies sapien. Etiam scelerisque justo at dapibus gravida. Vestibulum sit amet nisi elit. Nam scelerisque magna nibh, feugiat dictum magna blandit at. Praesent dictum mi nec fermentum consequat. Maecenas molestie urna et lorem auctor mollis vitae mollis eros. Phasellus interdum tortor sed venenatis porta. Mauris hendrerit quis neque id aliquet. In a scelerisque urna, in fringilla tortor. Fusce in sodales enim, id iaculis leo. Nulla in laoreet urna, et sodales sem. ";
   }
 
   public void cambioTema(String color) {
@@ -219,6 +310,7 @@ public class InfoLibro extends JFrame implements Interfaz {
     }
     for (JCheckBox jCheckBox : jCheckBoxA) {
       panelGenero.add(jCheckBox);
+      jCheckBox.setEnabled(false);
     }
     panelGenero.add(lblGeneros);
     for (JComponent jComponent : jCompPtecnicoA) {

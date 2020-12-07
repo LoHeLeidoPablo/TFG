@@ -5,6 +5,8 @@ import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
+
+import static com.mongodb.client.model.Filters.*;
 import static com.mongodb.client.model.Sorts.*;
 import static com.mongodb.client.model.Projections.*;
 import org.bson.Document;
@@ -39,6 +41,8 @@ public class IntfzPrincipal extends JFrame implements Interfaz {
   JLabel lblTitulo4 = new JLabel("Titulo Portada4");
   JLabel lblTitulo5 = new JLabel("Titulo Portada5");
 
+  Document libro;
+
   JFrame jFramePrincipal = new JFrame();
   JPanel panel = new JPanel();
   JPanel[] jPanelA = {panel};
@@ -67,8 +71,9 @@ public class IntfzPrincipal extends JFrame implements Interfaz {
     PanelBusqueda panelBusqueda = new PanelBusqueda(panel);
     crearComponentes();
     panel.setLayout(null);
-    irLibro(lblportada1);
-    irLibro(lblTitulo1);
+    for (JLabel jLabel : jLabelA) {
+      irLibro(jLabel);
+    }
     ultimosAgregados();
 
     lblportada1.setBounds(75, 100, 250, 467);
@@ -114,12 +119,6 @@ public class IntfzPrincipal extends JFrame implements Interfaz {
     Temas.cambioTema(color, jPanelA, jLabelA, null, null, null, null, null);
   }
 
-  public void cerrarVentana() {
-    jFramePrincipal.dispose();
-    panel.repaint();
-    panel.updateUI();
-  }
-
   public void crearComponentes() {
     for (JLabel jLabel : jLabelA) {
       panel.add(jLabel);
@@ -129,28 +128,27 @@ public class IntfzPrincipal extends JFrame implements Interfaz {
   }
 
   public void ultimosAgregados() {
-    MongoCursor<Document> documento =
+    MongoCursor<Document> ultimoAgregados =
         collecLibro.find().sort(descending("f_registro")).projection(include("Titulo")).iterator();
-    int i = 1;
-    for (int j = 1; i <= 5; i++) {
-      while (documento.hasNext()) {
-        Document dock = documento.next();
-        System.out.println(dock.toJson());
-        System.out.println(dock.get("Titulo").toString());
-        jLabelA[j + 4].setText(dock.get("Titulo").toString());
-        System.out.println(jLabelA[j + 4].getText());
-        j++;
+
+    for (int i = 0; i < 5; i++) {
+      while (ultimoAgregados.hasNext()) {
+        var titulos = ultimoAgregados.next();
+        jLabelA[i].setText(titulos.get("Titulo").toString());
+        jLabelA[i + 5].setText(titulos.get("Titulo").toString());
         break;
       }
     }
   }
 
-  public void irLibro(JComponent jComponent) {
-    jComponent.addMouseListener(
+  public void irLibro(JLabel jLabel) {
+    jLabel.addMouseListener(
         new MouseAdapter() {
           @Override
           public void mouseClicked(MouseEvent e) {
-            infoLibro.iniciar();
+            libro = collecLibro.find(eq("Titulo", jLabel.getText())).first();
+            infoLibro.dispose();
+            infoLibro.iniciar(libro);
           }
         });
   }

@@ -27,6 +27,8 @@ public class IntfzRegistro extends JFrame {
   MongoCollection<Document> collecAuth = DDBB.getCollection("Auth");
   MongoCollection<Document> collecUsuario = DDBB.getCollection("usuario");
 
+  IntfzLogin intfzLogin = new IntfzLogin();
+
   JPanel panel = new JPanel();
 
   JLabel lblTituloProyecto = new JLabel("Unete a Nosotros");
@@ -188,6 +190,8 @@ public class IntfzRegistro extends JFrame {
       mensajeEmergente(1);
       panel.setVisible(false);
       dispose();
+
+      intfzLogin.iniciar();
 
     } else {
       mensajeEmergente(2);

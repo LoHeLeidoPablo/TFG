@@ -4,7 +4,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 
-public class MiBiblioteca extends JFrame implements Interfaz {
+public class IntfzMiBiblioteca extends JFrame implements Interfaz {
   public static final long serialVersionUID = 1L;
   JFrame jFrameBiblio = new JFrame();
   JPanel panel = new JPanel();
@@ -14,7 +14,7 @@ public class MiBiblioteca extends JFrame implements Interfaz {
   DefaultTableModel modelT;
   JScrollPane scrollPane;
 
-  public MiBiblioteca() {
+  public IntfzMiBiblioteca() {
     this.setResizable(false);
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
   }

@@ -8,6 +8,15 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class MenuUsuario extends JFrame implements Interfaz {
+
+  InfoLibro infoLibro = new InfoLibro();
+  IntfzLogin intfzLogin = new IntfzLogin();
+  IntfzMiBiblioteca intfzMiBiblioteca = new IntfzMiBiblioteca();
+  IntfzMiCuenta intfzMiCuenta = new IntfzMiCuenta();
+  IntfzPrincipal intfzPrincipal = new IntfzPrincipal();
+  IntfzRegistro intfzRegistro = new IntfzRegistro();
+  IntfzRegLibro intfzRegLibro = new IntfzRegLibro();
+
   private String colorTema;
   private JLabel lblTituloProyecto;
   private JLabel lblUsuario;
@@ -87,10 +96,7 @@ public class MenuUsuario extends JFrame implements Interfaz {
           @Override
           public void actionPerformed(ActionEvent e) {
             jpanel.setVisible(false);
-            setVisible(false);
-            dispose();
-            MiCuenta ventana = new MiCuenta();
-            ventana.iniciar();
+            disposeAll();
           }
         });
     btnBiblioteca = new JButton("Mi biblioteca");
@@ -100,10 +106,7 @@ public class MenuUsuario extends JFrame implements Interfaz {
           @Override
           public void actionPerformed(ActionEvent e) {
             jpanel.setVisible(false);
-            setVisible(false);
-            dispose();
-            MiBiblioteca ventana = new MiBiblioteca();
-            ventana.iniciar();
+            disposeAll();
           }
         });
 
@@ -115,9 +118,8 @@ public class MenuUsuario extends JFrame implements Interfaz {
           public void actionPerformed(ActionEvent e) {
             IntfzLogin.id_Usuario = "Invitado";
             jpanel.setVisible(false);
-            dispose();
-            IntfzPrincipal ventana = new IntfzPrincipal();
-            ventana.iniciar();
+            disposeAll();
+            intfzPrincipal.iniciar();
           }
         });
 
@@ -139,10 +141,8 @@ public class MenuUsuario extends JFrame implements Interfaz {
           public void actionPerformed(ActionEvent e) {
             colorTema = jcbTemas.getSelectedItem().toString();
             interfazActiva.cambioTema(colorTema);
-            System.out.println(colorTema);
           }
         });
-
     btnLog();
   }
 
@@ -165,6 +165,16 @@ public class MenuUsuario extends JFrame implements Interfaz {
         jcbTemas.setBounds(10, 130, 180, 20);
       }
     }
+  }
+
+  public void disposeAll() {
+    infoLibro.dispose();
+    intfzLogin.dispose();
+    intfzMiBiblioteca.dispose();
+    intfzMiCuenta.dispose();
+    intfzPrincipal.dispose();
+    intfzRegistro.dispose();
+    intfzRegLibro.dispose();
   }
 
   public void cambioTema(String color) {

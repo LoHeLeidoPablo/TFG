@@ -1,10 +1,10 @@
 package mains;
 
-import Libreria.IntfzInicio;
+import Libreria.IntfzPntCarga;
 
 public class mainInicio {
   public static void main(String[] args) {
-    IntfzInicio ventana = new IntfzInicio();
+    IntfzPntCarga ventana = new IntfzPntCarga();
     ventana.iniciar();
   }
 }

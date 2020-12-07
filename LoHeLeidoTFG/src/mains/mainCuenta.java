@@ -1,10 +1,10 @@
 package mains;
 
-import Libreria.MiCuenta;
+import Libreria.IntfzMiCuenta;
 
 public class mainCuenta {
   public static void main(String[] args) {
-    MiCuenta ventana = new MiCuenta();
+    IntfzMiCuenta ventana = new IntfzMiCuenta();
     ventana.iniciar();
   }
 }

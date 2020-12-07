@@ -1,11 +1,34 @@
 package IntfzLibreria;
 
+import com.mongodb.MongoClient;
+import com.mongodb.MongoClientURI;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoCursor;
+import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
+import static com.mongodb.client.model.Filters.*;
+import static com.mongodb.client.model.Projections.*;
+import static com.mongodb.client.model.Sorts.*;
 
 public class IntfzPrincipal extends JFrame implements Interfaz {
+
+  MenuUsuario menuUsuario;
+  PanelBusqueda panelBusqueda;
+  IntfzInfoLibro intfzInfoLibro = new IntfzInfoLibro();
+
+  MongoClientURI uri =
+      new MongoClientURI(
+          "mongodb+srv://PabloBibTFG:7Infantes@biblioteca.w5wrr.mongodb.net/LoHeLeidoDB?retryWrites=true&w=majority");
+
+  MongoClient mongoClient = new MongoClient(uri);
+  MongoDatabase DDBB = mongoClient.getDatabase("LoHeLeidoDB");
+  MongoCollection<Document> collecLibro = DDBB.getCollection("Libro");
 
   JLabel lblportada1 = new JLabel("Portada1: 164 * 256");
   JLabel lblportada2 = new JLabel("Portada2: 164 * 256");
@@ -43,10 +66,14 @@ public class IntfzPrincipal extends JFrame implements Interfaz {
   public void iniciar() {
     setTitle("¿Lo he leído?");
     getContentPane().setLayout(new GridLayout(1, 10));
-    MenuUsuario menuUsuario = new MenuUsuario(panel, this);
-    PanelBusqueda panelBusqueda = new PanelBusqueda(panel);
+    menuUsuario = new MenuUsuario(panel, this);
+    panelBusqueda = new PanelBusqueda(panel);
     crearComponentes();
     panel.setLayout(null);
+    for (JLabel jLabel : jLabelA) {
+      irLibro(jLabel);
+    }
+    ultimosAgregados();
 
     lblportada1.setBounds(75, 100, 250, 467);
     lblportada2.setBounds(375, 100, lblportada1.getWidth(), lblportada1.getHeight());
@@ -85,6 +112,32 @@ public class IntfzPrincipal extends JFrame implements Interfaz {
     pack();
     setSize(1600, 1000);
     setVisible(true);
+  }
+
+  public void ultimosAgregados() {
+    MongoCursor<Document> ultimoAgregados =
+        collecLibro.find().sort(descending("f_registro")).projection(include("Titulo")).iterator();
+
+    for (int i = 0; i < 5; i++) {
+      while (ultimoAgregados.hasNext()) {
+        var titulos = ultimoAgregados.next();
+        jLabelA[i].setText(titulos.get("Titulo").toString());
+        jLabelA[i + 5].setText(titulos.get("Titulo").toString());
+        break;
+      }
+    }
+  }
+
+  public void irLibro(JLabel jLabel) {
+    jLabel.addMouseListener(
+        new MouseAdapter() {
+          @Override
+          public void mouseClicked(MouseEvent e) {
+            libro = collecLibro.find(eq("Titulo", jLabel.getText())).first();
+            intfzInfoLibro.dispose();
+            intfzInfoLibro.iniciar(libro);
+          }
+        });
   }
 
   public void cambioTema(String color) {

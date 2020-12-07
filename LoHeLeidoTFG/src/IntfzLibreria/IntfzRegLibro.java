@@ -1,6 +1,12 @@
 package IntfzLibreria;
 
+import com.mongodb.MongoClient;
+import com.mongodb.MongoClientURI;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
 import com.toedter.calendar.JDateChooser;
+import static com.mongodb.client.model.Filters.eq;
+import org.bson.Document;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -9,8 +15,20 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 public class IntfzRegLibro extends JFrame {
+
+  MongoClientURI uri =
+          new MongoClientURI(
+                  "mongodb+srv://PabloBibTFG:7Infantes@biblioteca.w5wrr.mongodb.net/LoHeLeidoDB?retryWrites=true&w=majority");
+
+  MongoClient mongoClient = new MongoClient(uri);
+  MongoDatabase DDBB = mongoClient.getDatabase("LoHeLeidoDB");
+  MongoCollection<Document> collecLibros = DDBB.getCollection("Libro");
+
 
   private JPanel panel = new JPanel();
   private JPanel panelGenero = new JPanel();
@@ -151,6 +169,59 @@ public class IntfzRegLibro extends JFrame {
     pack();
     setSize(950, 635);
     setVisible(true);
+  }
+
+  public void registroLibro() {
+    if (existeLibro() == false) {
+      String isbn = txtISBN.getText();
+      String titulo = txtTitlo.getText();
+      String autor = txtAutor.getText();
+      String saga = txtColeccion.getText();
+      Integer tomo = (Integer) spNColeccion.getValue();
+      Integer capitulos = (Integer) spCapitulos.getValue();
+      Date f_publicacion = datePublicacion.getDate();
+      Date f_registroLibro = new Date();
+      ArrayList<String> valoresCB = new ArrayList<String>();
+      for (JCheckBox jCheckBox : jCheckBoxeA) {
+        if (jCheckBox.isSelected()) {
+          valoresCB.add(jCheckBox.getText());
+        }
+      }
+      String resumen = txtASinopsis.getText();
+
+      Document libro = new Document();
+      // libro.put("Portada", archivo);
+      libro.put("ISBN", isbn);
+      libro.put("Titulo", titulo);
+      libro.put("Autor", autor);
+      libro.put("Saga", saga);
+      libro.put("Tomo", tomo);
+      libro.put("Capitulos", capitulos);
+      libro.put("f_publicacion", f_publicacion);
+      libro.put("Generos", valoresCB);
+      libro.put("Sinopsis", resumen);
+      libro.put("f_registro", f_registroLibro);
+      collecLibros.insertOne(libro);
+      mensajeEmergente(1);
+    } else {
+      mensajeEmergente(2);
+      existe = false;
+    }
+  }
+
+  public boolean existeLibro() {
+    //Document doc = collecLibros.find(eq("ISBN", txtISBN)).first();
+    // TODO El metodo de abajo es ineficiente
+    List<Document> consulta = collecLibros.find().into(new ArrayList<Document>());
+    for (int i = 0; i < consulta.size(); i++) {
+      Document usuario = consulta.get(i);
+      String ISBN = txtISBN.getText();
+      if (ISBN.equals(usuario.getString("ISBN"))) {
+        existe = true;
+        break;
+      }
+    }
+    return existe;
   }
 
   public void crearComponentes() {

@@ -107,7 +107,6 @@ public class IntfzPntCarga extends JFrame {
 
                 MongoClient mongoClient = new MongoClient(uri);
                 MongoDatabase DDBB = mongoClient.getDatabase("LoHeLeidoDB");
-                MongoCollection<Document> collecLibros = DDBB.getCollection("Libro");
                 t.stop();
                 panel.setVisible(false);
                 dispose();

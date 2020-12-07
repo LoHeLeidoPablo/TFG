@@ -101,7 +101,7 @@ public class IntfzMiCuenta extends JFrame implements Interfaz {
     panelPrestamo3.setLayout(null);
     panelPrestamo4.setLayout(null);
     panelPrestamo5.setLayout(null);
-
+    crearComponentes();
     getContentPane().add(panel);
 
     // Empaquetado, tamaño y visualizazion

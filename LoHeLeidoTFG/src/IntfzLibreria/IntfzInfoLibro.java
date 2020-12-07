@@ -3,7 +3,7 @@ package IntfzLibreria;
 import javax.swing.*;
 import java.awt.*;
 
-public class IntfzInfoLibro extends JFrame implements Interfaz{
+public class IntfzInfoLibro extends JFrame implements Interfaz {
 
   JPanel panel = new JPanel();
   JPanel panelGenero = new JPanel();

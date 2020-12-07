@@ -20,7 +20,6 @@ public class IntfzPrincipal extends JFrame implements Interfaz {
 
   Document libro;
 
-
   JPanel panel = new JPanel();
   JPanel[] jPanelA = {panel};
   JLabel[] jLabelA = {

@@ -43,12 +43,14 @@ public class IntfzLogin extends JFrame {
 
   Font font = lblRegistro.getFont();
 
-  public IntfzLogin() { this.setResizable(false);}
+  public IntfzLogin() {
+    this.setResizable(false);
+  }
 
   public void iniciar() {
     setTitle("Iniciar Sesión - ¿Lo he leído?");
     getContentPane().setLayout(new GridLayout(1, 10));
-    crearComponents();
+    crearComponentes();
     panel.setLayout(null);
 
     lblTituloProyecto.setBounds(65, 10, 170, 25);
@@ -114,7 +116,7 @@ public class IntfzLogin extends JFrame {
     setVisible(true);
   }
 
-  public void crearComponents() {
+  public void crearComponentes() {
     for (JComponent jComponent : jComponentA) {
       panel.add(jComponent);
     }

@@ -91,7 +91,7 @@ public class IntfzRegLibro extends JFrame {
     setTitle("Registrar libro - ¿Lo he leído?");
     getContentPane().setLayout(new GridLayout(1, 10));
     añadirPortada();
-    crearComponents();
+    crearComponentes();
 
     panel.setLayout(null);
     panelGenero.setLayout(null);
@@ -153,7 +153,7 @@ public class IntfzRegLibro extends JFrame {
     setVisible(true);
   }
 
-  public void crearComponents() {
+  public void crearComponentes() {
 
     for (JComponent jComponent : jComponentA) {
       panel.add(jComponent);

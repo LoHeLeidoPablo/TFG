@@ -1,7 +1,5 @@
 package IntfzLibreria;
 
-
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -68,7 +66,7 @@ public class IntfzRegistro extends JFrame {
   public void iniciar() {
     setTitle("Registrar - ¿Lo he leído?");
     getContentPane().setLayout(new GridLayout(1, 10));
-    crearComponents();
+    crearComponentes();
     mostrarContraseña(txtPassword);
     mostrarContraseña(txtRepPassword);
     rescribirCampo(txtUsuario, lblObUsuario);
@@ -181,7 +179,7 @@ public class IntfzRegistro extends JFrame {
     }
   }
 
-  public void crearComponents() {
+  public void crearComponentes() {
     for (JComponent jComponent : jComponentA) {
       panel.add(jComponent);
     }

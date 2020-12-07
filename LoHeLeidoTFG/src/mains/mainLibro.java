@@ -1,6 +1,5 @@
 package mains;
 
-import Libreria.*;
 import IntfzLibreria.*;
 
 public class mainLibro {

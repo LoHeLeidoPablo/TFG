@@ -7,7 +7,7 @@ import java.awt.event.MouseEvent;
 import java.awt.font.TextAttribute;
 import java.util.Map;
 
-public class PanelBusqueda extends JFrame  {
+public class PanelBusqueda extends JFrame {
   private JPanel panelBusqueda;
   private JComboBox<String> tipoBusqueda;
   private JTextField txtBusqueda;

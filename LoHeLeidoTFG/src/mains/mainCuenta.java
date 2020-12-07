@@ -1,6 +1,6 @@
 package mains;
 
-import Libreria.IntfzMiCuenta;
+import IntfzLibreria.*;
 
 public class mainCuenta {
   public static void main(String[] args) {

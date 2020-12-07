@@ -1,6 +1,6 @@
 package mains;
 
-import Libreria.*;
+import IntfzLibreria.*;
 
 public class mainRegistro {
   public static void main(String[] args) {

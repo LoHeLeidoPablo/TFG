@@ -1,7 +1,5 @@
-package Biblioteca;
+package IntfzLibreria;
 
-
-import Biblioteca.*;
 
 import javax.swing.*;
 import java.awt.*;

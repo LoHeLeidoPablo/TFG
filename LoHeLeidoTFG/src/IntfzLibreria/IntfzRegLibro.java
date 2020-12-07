@@ -1,4 +1,4 @@
-package Biblioteca;
+package IntfzLibreria;
 
 import com.toedter.calendar.JDateChooser;
 

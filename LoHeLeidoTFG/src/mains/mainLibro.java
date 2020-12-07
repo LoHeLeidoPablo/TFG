@@ -1,10 +1,11 @@
 package mains;
 
 import Libreria.*;
+import IntfzLibreria.*;
 
 public class mainLibro {
   public static void main(String[] args) {
-    InfoLibro ventana = new InfoLibro();
-    ventana.iniciar(null);
+    IntfzInfoLibro ventana = new IntfzInfoLibro();
+    ventana.iniciar();
   }
 }

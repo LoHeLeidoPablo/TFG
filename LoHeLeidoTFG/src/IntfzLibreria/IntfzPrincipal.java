@@ -1,6 +1,5 @@
-package Biblioteca;
+package IntfzLibreria;
 
-import Biblioteca.*;
 import org.bson.Document;
 
 import javax.swing.*;

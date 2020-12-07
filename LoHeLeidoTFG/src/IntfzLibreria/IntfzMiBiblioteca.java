@@ -1,6 +1,4 @@
-package Biblioteca;
-
-import Biblioteca.*;
+package IntfzLibreria;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -21,7 +19,7 @@ public class IntfzMiBiblioteca extends JFrame implements Interfaz {
   }
 
   public void iniciar() {
-    setTitle("¿Lo he leído? - Mi Biblioteca");
+    setTitle("¿Lo he leído? - Mi IntfzLibreria");
     getContentPane().setLayout(new GridLayout(1, 10));
     MenuUsuario menuUsuario = new MenuUsuario(panel, this);
     PanelBusqueda panelBusqueda = new PanelBusqueda(panel);

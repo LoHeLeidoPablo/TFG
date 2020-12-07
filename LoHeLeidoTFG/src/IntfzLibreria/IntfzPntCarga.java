@@ -1,4 +1,4 @@
-package Biblioteca;
+package IntfzLibreria;
 
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;

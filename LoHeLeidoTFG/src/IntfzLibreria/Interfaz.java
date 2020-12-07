@@ -1,4 +1,4 @@
-package Biblioteca;
+package IntfzLibreria;
 
 public interface Interfaz {
   void cambioTema(String colordeTema);

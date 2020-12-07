@@ -1,4 +1,4 @@
-package Biblioteca;
+package IntfzLibreria;
 
 import javax.swing.*;
 import java.awt.*;
@@ -13,7 +13,7 @@ public class PanelBusqueda extends JFrame  {
   private JTextField txtBusqueda;
   private JLabel lblnewBook =
       new JLabel(
-          "No encunetra el libro que busca en nuestra Biblioteca, pulse aqui para añadirlo.");
+          "No encunetra el libro que busca en nuestra IntfzLibreria, pulse aqui para añadirlo.");
   ;
   private boolean visible = true;
 

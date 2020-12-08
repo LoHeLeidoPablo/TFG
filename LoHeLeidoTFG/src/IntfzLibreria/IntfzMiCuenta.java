@@ -204,7 +204,59 @@ public class IntfzMiCuenta extends JFrame implements Interfaz {
     panelEstadisticas.setBorder(BorderFactory.createLineBorder(Color.black));
 
     panel.add(panelEstadisticas);
-    // coloresEstadistica();
+    coloresEstadistica();
+  }
+
+  private void coloresEstadistica() {
+
+    lblVerde.setBackground(Color.GREEN);
+    lblVerde.setOpaque(true);
+    lblVerde.setBorder(BorderFactory.createLineBorder(lblVerde.getBackground(), 2));
+    lblAzul.setBackground(Color.BLUE);
+    lblAzul.setOpaque(true);
+    lblAzul.setBorder(BorderFactory.createLineBorder(lblAzul.getBackground(), 2));
+    lblRojo.setBackground(Color.RED);
+    lblRojo.setOpaque(true);
+    lblRojo.setBorder(BorderFactory.createLineBorder(lblRojo.getBackground(), 2));
+    lblGris.setBackground(Color.GRAY);
+    lblGris.setOpaque(true);
+    lblGris.setBorder(BorderFactory.createLineBorder(lblGris.getBackground(), 2));
+
+    if (conteoTotal == 0) {
+    } else {
+      double vLV = ((((double) conteoLeyendo * 100) / conteoTotal) * 500) / 100;
+      double vLA = ((((double) conteoLeido * 100) / conteoTotal) * 500) / 100;
+      double vAR = ((((double) conteoAbandonado * 100) / conteoTotal) * 500) / 100;
+      double vQG = ((((double) conteoQuiero * 100) / conteoTotal) * 500) / 100;
+
+      valorLeyendoVerde = (int) Math.round(vLV);
+      valorLeidoAzul = (int) Math.round(vLA);
+      valorAbandonadoRojo = (int) Math.round(vAR);
+      valorQuieroGris = (int) Math.round(vQG);
+    }
+
+    lblVerde.setBounds(30, 30, valorLeyendoVerde, 30);
+    lblAzul.setBounds(lblVerde.getX() + valorLeyendoVerde, 30, valorLeidoAzul, 30);
+    lblRojo.setBounds(lblAzul.getX() + valorLeidoAzul, 30, valorAbandonadoRojo, 30);
+    lblGris.setBounds(lblRojo.getX() + valorAbandonadoRojo, 30, valorQuieroGris, 30);
+
+    panelEstadisticas.add(lblVerde);
+    panelEstadisticas.add(lblAzul);
+    panelEstadisticas.add(lblRojo);
+    panelEstadisticas.add(lblGris);
+
+    lblLeyendo.setBounds(50, 80, 200, 20);
+    lblLeyendo.setForeground(lblVerde.getBackground());
+    panelEstadisticas.add(lblLeyendo);
+    lblLeidos.setBounds(50, 100, 200, 20);
+    lblLeidos.setForeground(lblAzul.getBackground());
+    panelEstadisticas.add(lblLeidos);
+    lblAbandonados.setBounds(50, 120, 200, 20);
+    lblAbandonados.setForeground(lblRojo.getBackground());
+    panelEstadisticas.add(lblAbandonados);
+    lblQuieroLeer.setBounds(50, 140, 200, 20);
+    lblQuieroLeer.setForeground(lblGris.getBackground());
+    panelEstadisticas.add(lblQuieroLeer);
   }
 
   public void cambioTema(String color) {

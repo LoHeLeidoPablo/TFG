@@ -16,6 +16,7 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.text.SimpleDateFormat;
+import java.util.List;
 
 public class IntfzInfoLibro extends JFrame implements Interfaz {
 
@@ -55,6 +56,7 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
   JCheckBox ch10 = new JCheckBox("Policiaca");
   JCheckBox ch11 = new JCheckBox("Comic/Manga");
   JCheckBox ch12 = new JCheckBox("Otros");
+  List<Document> lstGeneros;
 
   JLabel lblISBN = new JLabel("ISBN: ");
   JLabel lblCapitulos = new JLabel("Capitulos:");
@@ -212,6 +214,15 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
     }
 
     lblAutor.setText(libro.getString("Autor"));
+    lstGeneros = (List<Document>) libro.get("Generos");
+    for (int k = 0, i = 0; k < jCheckBoxA.length; k++) {
+      if (lstGeneros.contains(jCheckBoxA[k].getText())) {
+        jCheckBoxA[k].setSelected(true);
+        i++;
+        if (i == lstGeneros.size()) break;
+      }
+    }
+
     txtASinopsis.setText(libro.getString("Sinopsis"));
     lblColeccion.setText("Saga: " + libro.getString("Saga") + "  " + libro.getInteger("Tomo"));
     lblCapitulos.setText("Capitulos: " + libro.getInteger("Capitulos"));

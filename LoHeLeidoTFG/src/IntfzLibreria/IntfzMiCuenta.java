@@ -16,28 +16,43 @@ public class IntfzMiCuenta extends JFrame implements Interfaz {
 
   JLabel lblPortada1 = new JLabel("Portada");
   JLabel lblTitulo1 = new JLabel("La Sombra del Zorro");
+  JLabel lblAutor1 = new JLabel("Julie Kagawa");
+  JLabel lblSaga1 = new JLabel("La Sombra del Zorro - 1");
   JLabel lblDiasRestantes1 = new JLabel("Te Quedan " + 15 + " dias");
-  // JLabel[] lblA1 = {lblPortada1, lblTitulo1, lblDiasRestantes1};
+  JLabel[] lblA1 = {lblPortada1, lblTitulo1, lblAutor1, lblSaga1, lblDiasRestantes1};
+  JButton btnDevolver1 = new JButton("Devolver");
 
   JLabel lblPortada2 = new JLabel("Portada");
   JLabel lblTitulo2 = new JLabel("El Ladrón del Rayo");
+  JLabel lblAutor2 = new JLabel("Rick Riordan");
+  JLabel lblSaga2 = new JLabel("Percy Jackson y los dioses del Olimpo - 1");
   JLabel lblDiasRestantes2 = new JLabel("Te Quedan " + 3 + " dias");
-  // JLabel[] lblA2 = {lblPortada2, lblTitulo2, lblDiasRestantes2};
+  JLabel[] lblA2 = {lblPortada2, lblTitulo2, lblAutor2, lblSaga2, lblDiasRestantes2};
+  JButton btnDevolver2 = new JButton("Devolver");
 
   JLabel lblPortada3 = new JLabel("Portada");
-  JLabel lblTitulo3 = new JLabel("El Hechicero");
+  JLabel lblTitulo3 = new JLabel("El Guerrero");
+  JLabel lblAutor3 = new JLabel("Tarhan Matharu");
+  JLabel lblSaga3 = new JLabel("La Leyendo del Hechicero - 2");
   JLabel lblDiasRestantes3 = new JLabel("Te Quedan " + 10 + " dias");
-  // JLabel[] lblA3 = {lblPortada3, lblTitulo3, lblDiasRestantes3};
+  JLabel[] lblA3 = {lblPortada3, lblTitulo3, lblAutor3, lblSaga3, lblDiasRestantes3};
+  JButton btnDevolver3 = new JButton("Devolver");
 
   JLabel lblPortada4 = new JLabel("Portada");
   JLabel lblTitulo4 = new JLabel("Fablehaven");
+  JLabel lblAutor4 = new JLabel("Brandom Mull");
+  JLabel lblSaga4 = new JLabel("Fablehaven - 1");
   JLabel lblDiasRestantes4 = new JLabel("Te Quedan " + 30 + " dias");
-  // JLabel[] lblA4 = {lblPortada4, lblTitulo4, lblDiasRestantes4};
+  JLabel[] lblA4 = {lblPortada4, lblTitulo4, lblAutor4, lblSaga4, lblDiasRestantes4};
+  JButton btnDevolver4 = new JButton("Devolver");
 
   JLabel lblPortada5 = new JLabel("Portada");
   JLabel lblTitulo5 = new JLabel("Vida y Muerte");
   JLabel lblDiasRestantes5 = new JLabel("Te Quedan " + 24 + " dias");
-  // JLabel[] lblA5 = {lblPortada5, lblTitulo5, lblDiasRestantes5};
+  JLabel lblAutor5 = new JLabel("Stephenie Meyer ");
+  JLabel lblSaga5 = new JLabel("Crepusculo 0");
+  JLabel[] lblA5 = {lblPortada5, lblTitulo5, lblAutor5, lblSaga5, lblDiasRestantes5};
+  JButton btnDevolver5 = new JButton("Devolver");
 
   JLabel lblAntiguedad =
       new JLabel("Antiguedad en Lo he Leído: " + 10 + " años " + 12 + " meses " + 31 + " días ");
@@ -116,7 +131,8 @@ public class IntfzMiCuenta extends JFrame implements Interfaz {
   }
 
   public void crearComponentesPrestamo() {
-    panelPrestamo.setBounds(10, 100, 515, 850);
+    panelPrestamo.setBounds(10, 100, 430, 850);
+    //panelPrestamo.setBounds(10, 100, 515, 850);
     panel.add(panelPrestamo);
 
     lblPortada1.setBounds(10, 10, 100, 150);
@@ -124,9 +140,16 @@ public class IntfzMiCuenta extends JFrame implements Interfaz {
     panelPrestamo1.add(lblPortada1);
     lblTitulo1.setBounds(125, 10, 250, 20);
     panelPrestamo1.add(lblTitulo1);
-    lblDiasRestantes1.setBounds(350, 145, 155, 20);
-    lblDiasRestantes1.setHorizontalAlignment(SwingConstants.RIGHT);
+    lblAutor1.setBounds(125, 35, 250, 20);
+    panelPrestamo1.add(lblAutor1);
+    lblSaga1.setBounds(125, 60, 300, 20);
+    panelPrestamo1.add(lblSaga1);
+    lblDiasRestantes1.setBounds(125, 135, 155, 20);
+    //lblDiasRestantes1.setBounds(125, 145, 155, 20);
     panelPrestamo1.add(lblDiasRestantes1);
+    btnDevolver1.setBounds(310, 135, 100, 20);
+   // btnDevolver1.setBounds(400, 145, 100, 20);
+    panelPrestamo1.add(btnDevolver1);
     panelPrestamo1.setBorder(BorderFactory.createLineBorder(Color.black));
     panelPrestamo.add(panelPrestamo1);
 
@@ -137,15 +160,25 @@ public class IntfzMiCuenta extends JFrame implements Interfaz {
     lblTitulo2.setBounds(
         lblTitulo1.getX(), lblTitulo1.getY(), lblTitulo1.getWidth(), lblTitulo1.getHeight());
     panelPrestamo2.add(lblTitulo2);
+    lblAutor2.setBounds(
+        lblAutor1.getX(), lblAutor1.getY(), lblAutor1.getWidth(), lblAutor1.getHeight());
+    panelPrestamo2.add(lblAutor2);
+    lblSaga2.setBounds(lblSaga1.getX(), lblSaga1.getY(), lblSaga1.getWidth(), lblSaga1.getHeight());
+    panelPrestamo2.add(lblSaga2);
     lblDiasRestantes2.setBounds(
         lblDiasRestantes1.getX(),
         lblDiasRestantes1.getY(),
         lblDiasRestantes1.getWidth(),
         lblDiasRestantes1.getHeight());
-    lblDiasRestantes2.setHorizontalAlignment(SwingConstants.RIGHT);
     panelPrestamo2.add(lblDiasRestantes2);
-    panelPrestamo.add(panelPrestamo2);
+    btnDevolver2.setBounds(
+        btnDevolver1.getX(),
+        btnDevolver1.getY(),
+        btnDevolver1.getWidth(),
+        btnDevolver1.getHeight());
+    panelPrestamo2.add(btnDevolver2);
     panelPrestamo2.setBorder(BorderFactory.createLineBorder(Color.black));
+    panelPrestamo.add(panelPrestamo2);
 
     lblPortada3.setBounds(
         lblPortada1.getX(), lblPortada1.getY(), lblPortada1.getWidth(), lblPortada1.getHeight());
@@ -154,15 +187,25 @@ public class IntfzMiCuenta extends JFrame implements Interfaz {
     lblTitulo3.setBounds(
         lblTitulo1.getX(), lblTitulo1.getY(), lblTitulo1.getWidth(), lblTitulo1.getHeight());
     panelPrestamo3.add(lblTitulo3);
+    lblAutor3.setBounds(
+        lblAutor1.getX(), lblAutor1.getY(), lblAutor1.getWidth(), lblAutor1.getHeight());
+    panelPrestamo3.add(lblAutor3);
+    lblSaga3.setBounds(lblSaga1.getX(), lblSaga1.getY(), lblSaga1.getWidth(), lblSaga1.getHeight());
+    panelPrestamo3.add(lblSaga3);
     lblDiasRestantes3.setBounds(
         lblDiasRestantes1.getX(),
         lblDiasRestantes1.getY(),
         lblDiasRestantes1.getWidth(),
         lblDiasRestantes1.getHeight());
-    lblDiasRestantes3.setHorizontalAlignment(SwingConstants.RIGHT);
     panelPrestamo3.add(lblDiasRestantes3);
-    panelPrestamo.add(panelPrestamo3);
+    btnDevolver3.setBounds(
+        btnDevolver1.getX(),
+        btnDevolver1.getY(),
+        btnDevolver1.getWidth(),
+        btnDevolver1.getHeight());
+    panelPrestamo3.add(btnDevolver3);
     panelPrestamo3.setBorder(BorderFactory.createLineBorder(Color.black));
+    panelPrestamo.add(panelPrestamo3);
 
     lblPortada4.setBounds(
         lblPortada1.getX(), lblPortada1.getY(), lblPortada1.getWidth(), lblPortada1.getHeight());
@@ -171,15 +214,25 @@ public class IntfzMiCuenta extends JFrame implements Interfaz {
     lblTitulo4.setBounds(
         lblTitulo1.getX(), lblTitulo1.getY(), lblTitulo1.getWidth(), lblTitulo1.getHeight());
     panelPrestamo4.add(lblTitulo4);
+    lblAutor4.setBounds(
+            lblAutor1.getX(), lblAutor1.getY(), lblAutor1.getWidth(), lblAutor1.getHeight());
+    panelPrestamo4.add(lblAutor4);
+    lblSaga4.setBounds( lblSaga1.getX(), lblSaga1.getY(), lblSaga1.getWidth(), lblSaga1.getHeight());
+    panelPrestamo4.add(lblSaga4);
     lblDiasRestantes4.setBounds(
         lblDiasRestantes1.getX(),
         lblDiasRestantes1.getY(),
         lblDiasRestantes1.getWidth(),
         lblDiasRestantes1.getHeight());
-    lblDiasRestantes4.setHorizontalAlignment(SwingConstants.RIGHT);
     panelPrestamo4.add(lblDiasRestantes4);
-    panelPrestamo.add(panelPrestamo4);
+    btnDevolver4.setBounds(
+        btnDevolver1.getX(),
+        btnDevolver1.getY(),
+        btnDevolver1.getWidth(),
+        btnDevolver1.getHeight());
+    panelPrestamo4.add(btnDevolver4);
     panelPrestamo4.setBorder(BorderFactory.createLineBorder(Color.black));
+    panelPrestamo.add(panelPrestamo4);
 
     lblPortada5.setBounds(
         lblPortada1.getX(), lblPortada1.getY(), lblPortada1.getWidth(), lblPortada1.getHeight());
@@ -188,15 +241,27 @@ public class IntfzMiCuenta extends JFrame implements Interfaz {
     lblTitulo5.setBounds(
         lblTitulo1.getX(), lblTitulo1.getY(), lblTitulo1.getWidth(), lblTitulo1.getHeight());
     panelPrestamo5.add(lblTitulo5);
+
+    lblAutor5.setBounds(
+            lblAutor1.getX(), lblAutor1.getY(), lblAutor1.getWidth(), lblAutor1.getHeight());
+    panelPrestamo5.add(lblAutor5);
+    lblSaga5.setBounds( lblSaga1.getX(), lblSaga1.getY(), lblSaga1.getWidth(), lblSaga1.getHeight());
+    panelPrestamo5.add(lblSaga5);
+
     lblDiasRestantes5.setBounds(
         lblDiasRestantes1.getX(),
         lblDiasRestantes1.getY(),
         lblDiasRestantes1.getWidth(),
         lblDiasRestantes1.getHeight());
-    lblDiasRestantes5.setHorizontalAlignment(SwingConstants.RIGHT);
     panelPrestamo5.add(lblDiasRestantes5);
-    panelPrestamo.add(panelPrestamo5);
+    btnDevolver5.setBounds(
+        btnDevolver1.getX(),
+        btnDevolver1.getY(),
+        btnDevolver1.getWidth(),
+        btnDevolver1.getHeight());
+    panelPrestamo5.add(btnDevolver5);
     panelPrestamo5.setBorder(BorderFactory.createLineBorder(Color.black));
+    panelPrestamo.add(panelPrestamo5);
   }
 
   private void crearComponentesEstadistica() {

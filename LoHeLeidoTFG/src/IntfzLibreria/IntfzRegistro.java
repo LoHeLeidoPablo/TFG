@@ -4,16 +4,15 @@ import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import static com.mongodb.client.model.Filters.*;
 import org.bson.Document;
+
+import static com.mongodb.client.model.Filters.*;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 public class IntfzRegistro extends JFrame {
 
@@ -168,22 +167,16 @@ public class IntfzRegistro extends JFrame {
 
   public void creacionUsuario() throws ParseException {
     if (existeUsuario() == false) {
-      String nameusu = txtUsuario.getText();
-      String email = txtEmail.getText();
-      String passwd = txtPassword.getText();
-
-      Date fechaRegistro = new Date();
-
       Document auth = new Document();
-      auth.put("Nombre", nameusu);
-      auth.put("Email", email);
-      auth.put("Contraseña", passwd);
+      auth.put("Nombre", txtUsuario.getText());
+      auth.put("Email", txtEmail.getText());
+      auth.put("Contraseña", txtPassword.getText());
       collecAuth.insertOne(auth);
 
       Document usuario = new Document();
-      usuario.put("Nombre", nameusu);
-      usuario.put("Email", email);
-      usuario.put("fCreacionCuenta", fechaRegistro);
+      usuario.put("Nombre", txtUsuario.getText());
+      usuario.put("Email", txtEmail.getText());
+      usuario.put("fCreacionCuenta", new Date());
       usuario.put("NPrestados", 0);
       collecUsuario.insertOne(usuario);
       mensajeEmergente(1);
@@ -199,15 +192,12 @@ public class IntfzRegistro extends JFrame {
   }
 
   public boolean existeUsuario() {
-    // Document doc = collecUsuario.find(eq("Email", txtEmail.getText())).first();
-    List<Document> consulta = collecUsuario.find().into(new ArrayList<Document>());
-    for (int i = 0; i < consulta.size(); i++) {
-      Document usuario = consulta.get(i);
-      String email = txtEmail.getText();
-      if (email.equals(usuario.getString("Email"))) {
-        existe = true;
-        break;
-      }
+    Document existeReg =
+        collecAuth
+            .find(or(eq("Nombre", txtUsuario.getText()), eq("Email", txtEmail.getText())))
+            .first();
+    if (existeReg != null) {
+      existe = true;
     }
     return existe;
   }
@@ -246,7 +236,10 @@ public class IntfzRegistro extends JFrame {
           JOptionPane.INFORMATION_MESSAGE);
     } else if (mensaje == 2) {
       JOptionPane.showMessageDialog(
-          null, "Este Usuario ya existe ", "Registro Fallido", JOptionPane.ERROR_MESSAGE);
+          null,
+          "Ya existe un usuario con este Nombre o correo electronico",
+          "Registro Fallido",
+          JOptionPane.ERROR_MESSAGE);
     }
   }
 

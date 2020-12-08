@@ -84,6 +84,7 @@ public class MenuUsuario extends JFrame {
         new ActionListener() {
           @Override
           public void actionPerformed(ActionEvent e) {
+
             IntfzLogin ventana = new IntfzLogin();
             ventana.iniciar();
           }
@@ -166,6 +167,11 @@ public class MenuUsuario extends JFrame {
       }
     }
   }
+
+  /*public void idUsuario(Document document) {
+    if (document == null) lblUsuario.setText("Invitado");
+    lblUsuario.setText(document.getString("Name"));
+  }*/
 
   public void disposeAll() {
     infoLibro.dispose();

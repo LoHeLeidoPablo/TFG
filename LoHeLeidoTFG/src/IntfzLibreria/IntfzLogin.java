@@ -11,8 +11,11 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.font.TextAttribute;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
+import static com.mongodb.client.model.Filters.*;
 
 public class IntfzLogin extends JFrame {
   public static String id_Usuario = "Invitado";
@@ -27,6 +30,8 @@ public class IntfzLogin extends JFrame {
   MongoDatabase DDBB = mongoClient.getDatabase("LoHeLeidoDB");
   MongoCollection<Document> collecAuth = DDBB.getCollection("Auth");
   MongoCollection<Document> collecUsuario = DDBB.getCollection("usuario");
+
+  public Document usuario;
 
   JPanel panel = new JPanel();
 
@@ -66,8 +71,8 @@ public class IntfzLogin extends JFrame {
   public void iniciar() {
     setTitle("Iniciar Sesión - ¿Lo he leído?");
     getContentPane().setLayout(new GridLayout(1, 10));
-    existeUsuario();
     crearComponentes();
+    existeUsuario();
     panel.setLayout(null);
 
     lblTituloProyecto.setBounds(65, 10, 170, 25);
@@ -138,30 +143,32 @@ public class IntfzLogin extends JFrame {
         new ActionListener() {
           @Override
           public void actionPerformed(ActionEvent e) {
-            List<Document> consulta = collecAuth.find().into(new ArrayList<Document>());
-            List<Document> etqUsuario = collecUsuario.find().into(new ArrayList<Document>());
-            // TODO
-            /* Document doc =
-            collecAuth
-                .find(
-                    and(eq("Nombre", txtUsuario.getText()), eq("Nombre", txtUsuario.getText())))
-                .first();*/
-
-            for (int i = 0; i < consulta.size(); i++) {
-              Document usuario = consulta.get(i);
-              Document auth = consulta.get(i);
-              String usu = txtUsuario.getText();
-              String passwd = txtPassword.getText();
-              if (usu.equals(auth.getString("Nombre"))
-                  | usu.equals(auth.getString("Email"))
-                      & passwd.equals(auth.getString("Contraseña"))) {
-                registrado = true;
-                break;
+            Document usuAuth =
+                collecAuth
+                    .find(
+                        and(
+                            or(
+                                eq("Nombre", txtUsuario.getText()),
+                                eq("Email", txtUsuario.getText())),
+                            eq("Contraseña", txtPassword.getText())))
+                    .first();
+            if (usuAuth != null) {
+              usuario =
+                  collecUsuario
+                      .find(
+                          and(
+                              eq("Nombre", usuAuth.getString("Nombre")),
+                              eq("Email", usuAuth.getString("Email"))))
+                      .first();
+              if (usuario == null) {
+                Document usuario = new Document();
+                usuario.put("Nombre", usuAuth.getString("Nombre"));
+                usuario.put("Email", usuAuth.getString("Email"));
+                usuario.put("fCreacionCuenta", new Date());
+                usuario.put("NPrestados", 0);
+                collecUsuario.insertOne(usuario);
               }
-            }
-            if (registrado == true) {
-              id_Usuario = txtUsuario.getText(); // Poco Eficiente
-              panel.setVisible(false);
+              id_Usuario = usuario.getString("Nombre");
               dispose();
               intfzPrincipal.iniciar();
             } else {

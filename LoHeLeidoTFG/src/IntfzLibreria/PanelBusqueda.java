@@ -33,7 +33,10 @@ public class PanelBusqueda extends JFrame {
 
     txtBusqueda = new JTextField("Buscar Titulo,Autor,Serie...");
     txtBusqueda.setBounds(330, 20, 1000, 30);
-    jpanel.add(txtBusqueda);
+    if (IntfzLogin.id_Usuario.equals("Invitado")) {
+    } else {
+      jpanel.add(txtBusqueda);
+    }
     txtBusqueda.addMouseListener(
         new MouseAdapter() {
           @Override

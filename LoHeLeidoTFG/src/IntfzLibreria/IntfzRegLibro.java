@@ -224,6 +224,17 @@ public class IntfzRegLibro extends JFrame {
     return existe;
   }
 
+  public boolean obligatorios(){
+    if(txtISBN.getText().isEmpty());{}
+    if(txtAutor.getText().isEmpty());{}
+    if(txtColeccion.getText().isEmpty());{}
+    //if(spNColeccion.getValue().equals(0));
+    //if(spNColeccion.getValue().equals(0));
+
+
+    return true;
+  }
+
   public void crearComponentes() {
 
     for (JComponent jComponent : jComponentA) {

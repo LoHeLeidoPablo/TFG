@@ -106,7 +106,7 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
   JCheckBox[] jCheckBoxA = {ch1, ch2, ch3, ch4, ch5, ch6, ch7, ch8, ch9, ch10, ch11, ch12};
   JButton[] jButtonA = {btnPrestamo};
   JComponent[] jCompPprincipalA = {
-    lblPortada, btnPrestamo, lblTitlo, lblAutor, panelGenero, lblResumen, txtASinopsis, tabbed
+    lblPortada, lblTitlo, lblAutor, panelGenero, lblResumen, txtASinopsis, tabbed
   };
   JComponent[] jCompPtecnicoA = {lblISBN, lblCapitulos, lblColeccion, lblPublicacion};
   JComponent[] jCompPestadoA = {
@@ -168,6 +168,7 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
     if (IntfzLogin.id_Usuario.equals("Invitado")) {
     } else {
       tabbed.addTab("Estado", panelEstado);
+      panel.add(btnPrestamo);
     }
     tabbed.addTab("Misma Coleccion", panelEntregas);
 

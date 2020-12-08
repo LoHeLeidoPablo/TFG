@@ -116,15 +116,18 @@ public class IntfzPrincipal extends JFrame implements Interfaz {
 
   public void ultimosAgregados() {
     MongoCursor<Document> ultimoAgregados =
-        collecLibro.find().sort(descending("f_registro")).projection(include("Titulo")).iterator();
-
-    for (int i = 0; i < 5; i++) {
-      while (ultimoAgregados.hasNext()) {
-        var titulos = ultimoAgregados.next();
-        jLabelA[i].setText(titulos.get("Titulo").toString());
-        jLabelA[i + 5].setText(titulos.get("Titulo").toString());
-        break;
-      }
+        collecLibro
+            .find()
+            .sort(descending("f_registro"))
+            .projection(include("Titulo"))
+            .limit(5)
+            .iterator();
+    int pos = -1;
+    while (ultimoAgregados.hasNext()) {
+      pos++;
+      Document titulos = ultimoAgregados.next();
+      jLabelA[pos].setText(titulos.get("Titulo").toString());
+      jLabelA[pos + 5].setText(titulos.get("Titulo").toString());
     }
   }
 

@@ -7,15 +7,22 @@ import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 
+import static IntfzLibreria.IntfzLogin.id_Usuario;
 import static com.mongodb.client.model.Filters.*;
 import static com.mongodb.client.model.Projections.*;
 import static com.mongodb.client.model.Sorts.*;
+import static com.mongodb.client.model.Updates.*;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 public class IntfzInfoLibro extends JFrame implements Interfaz {
@@ -27,6 +34,8 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
   MongoClient mongoClient = new MongoClient(uri);
   MongoDatabase DDBB = mongoClient.getDatabase("LoHeLeidoDB");
   MongoCollection<Document> collecLibro = DDBB.getCollection("Libro");
+  MongoCollection<Document> collecDetLibro = DDBB.getCollection("DetallesPrestamo");
+  MongoCollection<Document> collecUsuario = DDBB.getCollection("usuario");
 
   MongoCursor<Document> coleccion;
 
@@ -86,6 +95,9 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
   DefaultListModel dlm = new DefaultListModel();
   JScrollPane scrollPane = new JScrollPane(listasecuelas);
 
+  String colecc = new String();
+  String isbn = new String();
+
   JPanel[] jPanelA = {panel, panelGenero, panelTecnico, panelEstado, panelEntregas};
   JLabel[] jLabelA = {
     lblPortada,
@@ -115,10 +127,18 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
 
   public IntfzInfoLibro() {
     this.setResizable(false);
+    cambiarTomo();
+    prestarLibro();
   }
 
   public void iniciar(Document libro) {
-    if (libro != null) mostrarInfoLibro(libro);
+    if (libro != null) {
+      colecc = libro.getString("Saga");
+      isbn = libro.getString("ISBN");
+      mostrarInfoLibro(libro);
+      //prestarLibro();
+    }
+
     getContentPane().setLayout(new GridLayout(1, 15));
     crearComponentes();
     panel.setLayout(null);
@@ -165,7 +185,7 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
 
     tabbed.setBounds(950, 135, 350, 125);
     tabbed.addTab("Ficha Tecnica", panelTecnico);
-    if (IntfzLogin.id_Usuario.equals("Invitado")) {
+    if (id_Usuario.equals("Invitado")) {
     } else {
       tabbed.addTab("Estado", panelEstado);
       panel.add(btnPrestamo);
@@ -246,9 +266,10 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
       dlm.addElement(collecNume);
     }
     listasecuelas.setModel(dlm);
+    isbn = libro.getString("ISBN");
+  }
 
-    // TODO Cuanto más lo usas más tarda el proceso en ejecutarse en cualquiera de los dos casos
-
+  public void cambiarTomo() {
     listasecuelas.addMouseListener(
         new MouseAdapter() {
           public void mouseClicked(MouseEvent evt) {
@@ -257,10 +278,7 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
               int index = listasecuelas.locationToIndex(evt.getPoint());
               int i = 0;
               MongoCursor<Document> otroLibro =
-                  collecLibro
-                      .find(eq("Saga", libro.getString("Saga")))
-                      .sort(ascending("Tomo"))
-                      .iterator();
+                  collecLibro.find(eq("Saga", colecc)).sort(ascending("Tomo")).iterator();
               while (otroLibro.hasNext()) {
                 Document libroColec = otroLibro.next();
                 if (i == index) {
@@ -273,30 +291,77 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
             return;
           }
         });
+  }
 
-    listasecuelas.addMouseListener(
-        new MouseAdapter() {
-          public void mouseClicked(MouseEvent evt) {
-            listasecuelas = (JList) evt.getSource();
-            if (evt.getClickCount() == 2) {
-              int index = listasecuelas.locationToIndex(evt.getPoint());
-              int i = 0;
-              MongoCursor<Document> otroLibro =
-                  collecLibro
-                      .find(eq("Saga", libro.getString("Saga")))
-                      .sort(ascending("Tomo"))
-                      .iterator();
-              while (otroLibro.hasNext()) {
-                Document libroColec = otroLibro.next();
-                if (i == index) {
-                  dispose();
-                  iniciar(libroColec);
+  public void prestarLibro() {
+    btnPrestamo.addActionListener(
+        new ActionListener() {
+          @Override
+          public void actionPerformed(ActionEvent e) {
+            Document usuario = collecUsuario.find(eq("Nombre", id_Usuario)).first();
+            if (usuario.getInteger("NPrestados") < 5) {
+              Calendar calc_fecha = Calendar.getInstance();
+              calc_fecha.setTime(new Date());
+              calc_fecha.set(Calendar.DAY_OF_YEAR, calc_fecha.get(Calendar.DAY_OF_YEAR) + 30);
+              Date f_devolucion = calc_fecha.getTime();
+              try {
+                Document prestamo = new Document();
+                prestamo.put("ISBN", isbn);
+                prestamo.put("emailUsu", usuario.getString("Email"));
+                prestamo.put("f_prestamo", new Date());
+                prestamo.put("f_devolucion", f_devolucion);
+                prestamo.put("Prestado", true);
+                Document comproPrestamo =
+                    collecDetLibro
+                        .find(
+                            and(
+                                eq("emailUsu", prestamo.getString("emailUsu")),
+                                eq("ISBN", prestamo.getString("ISBN")),
+                                eq("Prestado", true)))
+                        /*.sort(descending("f_prestamo"))*/
+                        .first();
+                if (comproPrestamo == null) {
+                  collecDetLibro.insertOne(prestamo);
+                  collecUsuario.updateOne(
+                      eq("Email", usuario.getString("Email")),
+                      set("NPrestados", usuario.getInteger("NPrestados") + 1));
+                  mensajeEmergente(1);
+                } else {
+                  mensajeEmergente(4);
                 }
-                i++;
+              } catch (Exception exception) {
               }
+
+            } else {
+              mensajeEmergente(2);
             }
           }
         });
+  }
+
+  public void mensajeEmergente(int mensaje) {
+    if (mensaje == 1) {
+      JOptionPane.showMessageDialog(
+          null, "Libro Prestado Correctamente", "Libro Prestado", JOptionPane.INFORMATION_MESSAGE);
+    } if (mensaje == 2) {
+      JOptionPane.showMessageDialog(
+          null,
+          "Este usuario ya ha tomado prestado el limite maximo de 5 libros simultaneos ",
+          "Advertencia",
+          JOptionPane.INFORMATION_MESSAGE);
+    }  if (mensaje == 3) {
+      JOptionPane.showMessageDialog(
+          null,
+          "El Prestamo no ha podido realizarse correctamente, por favor vuelva a intentarlo",
+          "Prestamo Fallido",
+          JOptionPane.INFORMATION_MESSAGE);
+    }  if (mensaje == 4) {
+      JOptionPane.showMessageDialog(
+          null,
+          "Este Usuario ya tiene este libro en prestamo",
+          " Ya Prestado ",
+          JOptionPane.INFORMATION_MESSAGE);
+    }
   }
 
   public String loreIpsum() {

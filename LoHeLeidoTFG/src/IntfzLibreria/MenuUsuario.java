@@ -1,5 +1,11 @@
 package IntfzLibreria;
 
+import com.mongodb.MongoClient;
+import com.mongodb.MongoClientURI;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import org.bson.Document;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -8,6 +14,14 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 public class MenuUsuario extends JFrame {
+
+  MongoClientURI uri =
+      new MongoClientURI(
+          "mongodb+srv://PabloBibTFG:7Infantes@biblioteca.w5wrr.mongodb.net/LoHeLeidoDB?retryWrites=true&w=majority");
+
+  MongoClient mongoClient = new MongoClient(uri);
+  MongoDatabase DDBB = mongoClient.getDatabase("LoHeLeidoDB");
+  MongoCollection<Document> collecUsuario = DDBB.getCollection("usuario");
 
   IntfzInfoLibro infoLibro = new IntfzInfoLibro();
   IntfzLogin intfzLogin = new IntfzLogin();
@@ -19,7 +33,7 @@ public class MenuUsuario extends JFrame {
 
   private String colorTema;
   private JLabel lblTituloProyecto;
-  private JLabel lblUsuario;
+  private JLabel lblUsuario = new JLabel();
   private JPanel panelMenuUsuario;
   private JComboBox<String> jcbTemas;
   private JButton btnLogIn;
@@ -27,7 +41,7 @@ public class MenuUsuario extends JFrame {
   private JButton btnBiblioteca;
   private JButton btnLogOut;
   private JButton btnClose;
-  private boolean visible = true;
+  private Boolean visible = true;
   private Interfaz interfazActiva;
   private JPanel[] jPanelA = {panelMenuUsuario};
   private JLabel[] jLabelA = {lblTituloProyecto, lblUsuario};
@@ -63,8 +77,8 @@ public class MenuUsuario extends JFrame {
       "Verde Claro",
       "Azul Claro",
     };
-
-    lblUsuario = new JLabel(IntfzLogin.id_Usuario);
+    lblUsuario.setText(IntfzLogin.UsuCuenta.getString("Nombre"));
+    lblUsuario.setText(lblUsuario.getText() == null ? "Invitado" : lblUsuario.getText());
     lblUsuario.setBounds(1400, 15, 100, 15);
     jpanel.add(lblUsuario);
     lblUsuario.addMouseListener(
@@ -98,6 +112,7 @@ public class MenuUsuario extends JFrame {
           public void actionPerformed(ActionEvent e) {
             jpanel.setVisible(false);
             disposeAll();
+            intfzMiCuenta.iniciar();
           }
         });
     btnBiblioteca = new JButton("Mi biblioteca");
@@ -108,6 +123,7 @@ public class MenuUsuario extends JFrame {
           public void actionPerformed(ActionEvent e) {
             jpanel.setVisible(false);
             disposeAll();
+            intfzMiBiblioteca.iniciar();
           }
         });
 
@@ -117,7 +133,7 @@ public class MenuUsuario extends JFrame {
         new ActionListener() {
           @Override
           public void actionPerformed(ActionEvent e) {
-            IntfzLogin.id_Usuario = "Invitado";
+            lblUsuario.setText("Invitado");
             jpanel.setVisible(false);
             disposeAll();
             intfzPrincipal.iniciar();
@@ -150,7 +166,7 @@ public class MenuUsuario extends JFrame {
   public void btnLog() {
     if (lblUsuario == null) {
     } else {
-      if (lblUsuario.getText().equals("Invitado")) {
+      if ("Invitado".equals(lblUsuario.getText())) {
         btnLogOut.setVisible(false);
         btnCuenta.setVisible(false);
         btnBiblioteca.setVisible(false);

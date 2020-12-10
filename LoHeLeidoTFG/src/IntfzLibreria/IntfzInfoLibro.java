@@ -136,7 +136,6 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
       colecc = libro.getString("Saga");
       isbn = libro.getString("ISBN");
       mostrarInfoLibro(libro);
-      //prestarLibro();
     }
 
     getContentPane().setLayout(new GridLayout(1, 15));

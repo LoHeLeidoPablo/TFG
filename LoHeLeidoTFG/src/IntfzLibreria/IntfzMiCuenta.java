@@ -132,7 +132,6 @@ public class IntfzMiCuenta extends JFrame implements Interfaz {
 
   public void crearComponentesPrestamo() {
     panelPrestamo.setBounds(10, 100, 430, 850);
-    //panelPrestamo.setBounds(10, 100, 515, 850);
     panel.add(panelPrestamo);
 
     lblPortada1.setBounds(10, 10, 100, 150);
@@ -145,10 +144,8 @@ public class IntfzMiCuenta extends JFrame implements Interfaz {
     lblSaga1.setBounds(125, 60, 300, 20);
     panelPrestamo1.add(lblSaga1);
     lblDiasRestantes1.setBounds(125, 135, 155, 20);
-    //lblDiasRestantes1.setBounds(125, 145, 155, 20);
     panelPrestamo1.add(lblDiasRestantes1);
     btnDevolver1.setBounds(310, 135, 100, 20);
-   // btnDevolver1.setBounds(400, 145, 100, 20);
     panelPrestamo1.add(btnDevolver1);
     panelPrestamo1.setBorder(BorderFactory.createLineBorder(Color.black));
     panelPrestamo.add(panelPrestamo1);
@@ -215,9 +212,9 @@ public class IntfzMiCuenta extends JFrame implements Interfaz {
         lblTitulo1.getX(), lblTitulo1.getY(), lblTitulo1.getWidth(), lblTitulo1.getHeight());
     panelPrestamo4.add(lblTitulo4);
     lblAutor4.setBounds(
-            lblAutor1.getX(), lblAutor1.getY(), lblAutor1.getWidth(), lblAutor1.getHeight());
+        lblAutor1.getX(), lblAutor1.getY(), lblAutor1.getWidth(), lblAutor1.getHeight());
     panelPrestamo4.add(lblAutor4);
-    lblSaga4.setBounds( lblSaga1.getX(), lblSaga1.getY(), lblSaga1.getWidth(), lblSaga1.getHeight());
+    lblSaga4.setBounds(lblSaga1.getX(), lblSaga1.getY(), lblSaga1.getWidth(), lblSaga1.getHeight());
     panelPrestamo4.add(lblSaga4);
     lblDiasRestantes4.setBounds(
         lblDiasRestantes1.getX(),
@@ -243,9 +240,9 @@ public class IntfzMiCuenta extends JFrame implements Interfaz {
     panelPrestamo5.add(lblTitulo5);
 
     lblAutor5.setBounds(
-            lblAutor1.getX(), lblAutor1.getY(), lblAutor1.getWidth(), lblAutor1.getHeight());
+        lblAutor1.getX(), lblAutor1.getY(), lblAutor1.getWidth(), lblAutor1.getHeight());
     panelPrestamo5.add(lblAutor5);
-    lblSaga5.setBounds( lblSaga1.getX(), lblSaga1.getY(), lblSaga1.getWidth(), lblSaga1.getHeight());
+    lblSaga5.setBounds(lblSaga1.getX(), lblSaga1.getY(), lblSaga1.getWidth(), lblSaga1.getHeight());
     panelPrestamo5.add(lblSaga5);
 
     lblDiasRestantes5.setBounds(
@@ -263,6 +260,10 @@ public class IntfzMiCuenta extends JFrame implements Interfaz {
     panelPrestamo5.setBorder(BorderFactory.createLineBorder(Color.black));
     panelPrestamo.add(panelPrestamo5);
   }
+
+  private void mostrarPrestamo() {}
+
+  public void devolverPrestamo(JButton jButton) {}
 
   private void crearComponentesEstadistica() {
     panelEstadisticas.setBounds(550, 100, 1000, 850);

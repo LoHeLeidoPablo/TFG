@@ -19,6 +19,7 @@ import static com.mongodb.client.model.Filters.*;
 
 public class IntfzLogin extends JFrame {
   public static String id_Usuario = "Invitado";
+  public static Document UsuCuenta = new Document();
 
   IntfzPrincipal intfzPrincipal = new IntfzPrincipal();
 
@@ -30,8 +31,6 @@ public class IntfzLogin extends JFrame {
   MongoDatabase DDBB = mongoClient.getDatabase("LoHeLeidoDB");
   MongoCollection<Document> collecAuth = DDBB.getCollection("Auth");
   MongoCollection<Document> collecUsuario = DDBB.getCollection("usuario");
-
-  public Document usuario;
 
   JPanel panel = new JPanel();
 
@@ -153,22 +152,22 @@ public class IntfzLogin extends JFrame {
                             eq("Contraseña", txtPassword.getText())))
                     .first();
             if (usuAuth != null) {
-              usuario =
+              UsuCuenta =
                   collecUsuario
                       .find(
                           and(
                               eq("Nombre", usuAuth.getString("Nombre")),
                               eq("Email", usuAuth.getString("Email"))))
                       .first();
-              if (usuario == null) {
-                Document usuario = new Document();
-                usuario.put("Nombre", usuAuth.getString("Nombre"));
-                usuario.put("Email", usuAuth.getString("Email"));
-                usuario.put("fCreacionCuenta", new Date());
-                usuario.put("NPrestados", 0);
-                collecUsuario.insertOne(usuario);
+              if (UsuCuenta == null) {
+
+                UsuCuenta.put("Nombre", usuAuth.getString("Nombre"));
+                UsuCuenta.put("Email", usuAuth.getString("Email"));
+                UsuCuenta.put("fCreacionCuenta", new Date());
+                UsuCuenta.put("NPrestados", 0);
+                collecUsuario.insertOne(UsuCuenta);
               }
-              id_Usuario = usuario.getString("Nombre");
+              id_Usuario = UsuCuenta.getString("Nombre");
               dispose();
               intfzPrincipal.iniciar();
             } else {
@@ -180,7 +179,7 @@ public class IntfzLogin extends JFrame {
             }
           }
         });
-    // TODO Pasar objeto Auth a objeto Usuario
+    // TODO Relanzar Principal para que aparezca el usuario que acaba de iniciar sesion
     /*
     menuUsuario = new Libreria.MenuUsuario(intfzPrincipal.panel,intfzPrincipal.jFramePrincipal,null);
        menuUsuario.repaint();

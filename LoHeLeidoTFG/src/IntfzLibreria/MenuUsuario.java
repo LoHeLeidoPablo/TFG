@@ -8,10 +8,7 @@ import org.bson.Document;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
+import java.awt.event.*;
 
 public class MenuUsuario extends JFrame {
 
@@ -31,20 +28,20 @@ public class MenuUsuario extends JFrame {
   IntfzRegistro intfzRegistro = new IntfzRegistro();
   IntfzRegLibro intfzRegLibro = new IntfzRegLibro();
 
-  private String colorTema;
-  private JLabel lblTituloProyecto;
-  private JLabel lblUsuario = new JLabel();
-  private JPanel panelMenuUsuario;
-  private JComboBox<String> jcbTemas;
-  private JButton btnLogIn;
-  private JButton btnCuenta;
-  private JButton btnBiblioteca;
-  private JButton btnLogOut;
-  private JButton btnClose;
-  private Boolean visible = true;
-  private Interfaz interfazActiva;
-  private JPanel[] jPanelA = {panelMenuUsuario};
-  private JLabel[] jLabelA = {lblTituloProyecto, lblUsuario};
+  String colorTema;
+  JLabel lblTituloProyecto;
+  JLabel lblUsuario = new JLabel();
+  JPanel panelMenuUsuario;
+  JComboBox<String> jcbTemas;
+  JButton btnLogIn;
+  JButton btnCuenta;
+  JButton btnBiblioteca;
+  JButton btnLogOut;
+  JButton btnClose;
+  Boolean visible = true;
+  Interfaz interfazActiva;
+  JPanel[] jPanelA = {panelMenuUsuario};
+  JLabel[] jLabelA = {lblTituloProyecto, lblUsuario};
 
   public MenuUsuario() {}
 
@@ -98,7 +95,6 @@ public class MenuUsuario extends JFrame {
         new ActionListener() {
           @Override
           public void actionPerformed(ActionEvent e) {
-
             IntfzLogin ventana = new IntfzLogin();
             ventana.iniciar();
           }
@@ -110,7 +106,6 @@ public class MenuUsuario extends JFrame {
         new ActionListener() {
           @Override
           public void actionPerformed(ActionEvent e) {
-            jpanel.setVisible(false);
             disposeAll();
             intfzMiCuenta.iniciar();
           }
@@ -121,7 +116,6 @@ public class MenuUsuario extends JFrame {
         new ActionListener() {
           @Override
           public void actionPerformed(ActionEvent e) {
-            jpanel.setVisible(false);
             disposeAll();
             intfzMiBiblioteca.iniciar();
           }
@@ -134,7 +128,6 @@ public class MenuUsuario extends JFrame {
           @Override
           public void actionPerformed(ActionEvent e) {
             lblUsuario.setText("Invitado");
-            jpanel.setVisible(false);
             disposeAll();
             intfzPrincipal.iniciar();
           }
@@ -184,19 +177,56 @@ public class MenuUsuario extends JFrame {
     }
   }
 
-  /*public void idUsuario(Document document) {
-    if (document == null) lblUsuario.setText("Invitado");
-    lblUsuario.setText(document.getString("Name"));
-  }*/
-
   public void disposeAll() {
-    infoLibro.dispose();
-    intfzLogin.dispose();
-    intfzMiBiblioteca.dispose();
-    intfzMiCuenta.dispose();
-    intfzPrincipal.dispose();
-    intfzRegistro.dispose();
-    intfzRegLibro.dispose();
+
+    intfzPrincipal.addWindowListener(
+        new WindowAdapter() {
+          @Override
+          public void windowClosing(WindowEvent e) {
+            super.windowClosing(e);
+            dispose();
+          }
+        });
+    intfzLogin.addWindowListener(
+        new WindowAdapter() {
+          @Override
+          public void windowClosing(WindowEvent e) {
+            super.windowClosing(e);
+            dispose();
+          }
+        });
+    intfzMiBiblioteca.addWindowListener(
+        new WindowAdapter() {
+          @Override
+          public void windowClosing(WindowEvent e) {
+            super.windowClosing(e);
+            dispose();
+          }
+        });
+    intfzMiCuenta.addWindowListener(
+        new WindowAdapter() {
+          @Override
+          public void windowClosing(WindowEvent e) {
+            super.windowClosing(e);
+            dispose();
+          }
+        });
+    intfzRegistro.addWindowListener(
+        new WindowAdapter() {
+          @Override
+          public void windowClosing(WindowEvent e) {
+            super.windowClosing(e);
+            dispose();
+          }
+        });
+    intfzRegLibro.addWindowListener(
+        new WindowAdapter() {
+          @Override
+          public void windowClosing(WindowEvent e) {
+            super.windowClosing(e);
+            dispose();
+          }
+        });
   }
 
   public void cambioTema(String color) {

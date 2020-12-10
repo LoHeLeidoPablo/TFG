@@ -1,9 +1,30 @@
 package IntfzLibreria;
 
+import com.mongodb.MongoClient;
+import com.mongodb.MongoClientURI;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoCursor;
+import com.mongodb.client.MongoDatabase;
+import org.bson.Document;
+
 import javax.swing.*;
 import java.awt.*;
 
+import static IntfzLibreria.IntfzLogin.id_Usuario;
+import static com.mongodb.client.model.Filters.*;
+import static com.mongodb.client.model.Sorts.*;
+
 public class IntfzMiCuenta extends JFrame implements Interfaz {
+
+  MongoClientURI uri =
+      new MongoClientURI(
+          "mongodb+srv://PabloBibTFG:7Infantes@biblioteca.w5wrr.mongodb.net/LoHeLeidoDB?retryWrites=true&w=majority");
+
+  MongoClient mongoClient = new MongoClient(uri);
+  MongoDatabase DDBB = mongoClient.getDatabase("LoHeLeidoDB");
+  MongoCollection<Document> collecLibro = DDBB.getCollection("Libro");
+  MongoCollection<Document> collecDetLibro = DDBB.getCollection("DetallesPrestamo");
+  MongoCollection<Document> collecUsuario = DDBB.getCollection("usuario");
 
   JPanel panel = new JPanel();
   JPanel panelPrestamo = new JPanel();
@@ -15,42 +36,42 @@ public class IntfzMiCuenta extends JFrame implements Interfaz {
   JPanel panelEstadisticas = new JPanel();
 
   JLabel lblPortada1 = new JLabel("Portada");
-  JLabel lblTitulo1 = new JLabel("La Sombra del Zorro");
-  JLabel lblAutor1 = new JLabel("Julie Kagawa");
+  JLabel lblTitulo1 = new JLabel("Titulo Prestamo 1");
+  JLabel lblAutor1 = new JLabel("Autor Prestamo 1");
   JLabel lblSaga1 = new JLabel("La Sombra del Zorro - 1");
-  JLabel lblDiasRestantes1 = new JLabel("Te Quedan " + 15 + " dias");
+  JLabel lblDiasRestantes1 = new JLabel("Te Quedan X dias");
   JLabel[] lblA1 = {lblPortada1, lblTitulo1, lblAutor1, lblSaga1, lblDiasRestantes1};
   JButton btnDevolver1 = new JButton("Devolver");
 
   JLabel lblPortada2 = new JLabel("Portada");
-  JLabel lblTitulo2 = new JLabel("El Ladrón del Rayo");
-  JLabel lblAutor2 = new JLabel("Rick Riordan");
+  JLabel lblTitulo2 = new JLabel("Titulo Prestamo 2");
+  JLabel lblAutor2 = new JLabel("Autor Prestamo 2");
   JLabel lblSaga2 = new JLabel("Percy Jackson y los dioses del Olimpo - 1");
-  JLabel lblDiasRestantes2 = new JLabel("Te Quedan " + 3 + " dias");
+  JLabel lblDiasRestantes2 = new JLabel("Te Quedan X dias");
   JLabel[] lblA2 = {lblPortada2, lblTitulo2, lblAutor2, lblSaga2, lblDiasRestantes2};
   JButton btnDevolver2 = new JButton("Devolver");
 
   JLabel lblPortada3 = new JLabel("Portada");
-  JLabel lblTitulo3 = new JLabel("El Guerrero");
-  JLabel lblAutor3 = new JLabel("Tarhan Matharu");
+  JLabel lblTitulo3 = new JLabel("Titulo Prestamo 3");
+  JLabel lblAutor3 = new JLabel("Autor Prestamo 3");
   JLabel lblSaga3 = new JLabel("La Leyendo del Hechicero - 2");
-  JLabel lblDiasRestantes3 = new JLabel("Te Quedan " + 10 + " dias");
+  JLabel lblDiasRestantes3 = new JLabel("Te Quedan X dias");
   JLabel[] lblA3 = {lblPortada3, lblTitulo3, lblAutor3, lblSaga3, lblDiasRestantes3};
   JButton btnDevolver3 = new JButton("Devolver");
 
   JLabel lblPortada4 = new JLabel("Portada");
-  JLabel lblTitulo4 = new JLabel("Fablehaven");
-  JLabel lblAutor4 = new JLabel("Brandom Mull");
+  JLabel lblTitulo4 = new JLabel("Titulo Prestamo 4");
+  JLabel lblAutor4 = new JLabel("Autor Prestamo 4");
   JLabel lblSaga4 = new JLabel("Fablehaven - 1");
-  JLabel lblDiasRestantes4 = new JLabel("Te Quedan " + 30 + " dias");
+  JLabel lblDiasRestantes4 = new JLabel("Te Quedan X dias");
   JLabel[] lblA4 = {lblPortada4, lblTitulo4, lblAutor4, lblSaga4, lblDiasRestantes4};
   JButton btnDevolver4 = new JButton("Devolver");
 
   JLabel lblPortada5 = new JLabel("Portada");
-  JLabel lblTitulo5 = new JLabel("Vida y Muerte");
-  JLabel lblDiasRestantes5 = new JLabel("Te Quedan " + 24 + " dias");
-  JLabel lblAutor5 = new JLabel("Stephenie Meyer ");
+  JLabel lblTitulo5 = new JLabel("Titulo Prestamo 5");
+  JLabel lblAutor5 = new JLabel("Autor Prestamo 5");
   JLabel lblSaga5 = new JLabel("Crepusculo 0");
+  JLabel lblDiasRestantes5 = new JLabel("Te Quedan X dias");
   JLabel[] lblA5 = {lblPortada5, lblTitulo5, lblAutor5, lblSaga5, lblDiasRestantes5};
   JButton btnDevolver5 = new JButton("Devolver");
 
@@ -261,7 +282,16 @@ public class IntfzMiCuenta extends JFrame implements Interfaz {
     panelPrestamo.add(panelPrestamo5);
   }
 
-  private void mostrarPrestamo() {}
+  private void mostrarPrestamo() {
+    //TODO SIN TERMINAR
+    Document usuario = collecUsuario.find(eq("Nombre", id_Usuario)).first();
+    MongoCursor<Document> prestamosUsuario =
+        collecDetLibro
+            .find(and(eq("emailUsu", usuario.getString("email")), eq("Prestado", true)))
+            .sort(ascending())
+            .iterator();
+
+  }
 
   public void devolverPrestamo(JButton jButton) {}
 

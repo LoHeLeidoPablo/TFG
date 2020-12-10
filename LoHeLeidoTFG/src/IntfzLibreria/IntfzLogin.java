@@ -169,6 +169,7 @@ public class IntfzLogin extends JFrame {
               }
               id_Usuario = UsuCuenta.getString("Nombre");
               dispose();
+              //menuUsuario.lblUsuario.setText(id_Usuario);
               intfzPrincipal.iniciar();
             } else {
               JOptionPane.showMessageDialog(
@@ -180,8 +181,8 @@ public class IntfzLogin extends JFrame {
           }
         });
     // TODO Relanzar Principal para que aparezca el usuario que acaba de iniciar sesion
-    /*
-    menuUsuario = new Libreria.MenuUsuario(intfzPrincipal.panel,intfzPrincipal.jFramePrincipal,null);
+
+/*    menuUsuario = new Libreria.MenuUsuario(intfzPrincipal.panel,intfzPrincipal.jFramePrincipal,null);
        menuUsuario.repaint();
        intfzPrincipal.panel.repaint();
        intfzPrincipal.cerrarVentana();

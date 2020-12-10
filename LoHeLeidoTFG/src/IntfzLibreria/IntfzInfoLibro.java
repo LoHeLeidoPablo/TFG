@@ -39,6 +39,8 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
 
   MongoCursor<Document> coleccion;
 
+  IntfzActualizarLibro intfzActualizarLibro = new IntfzActualizarLibro();
+
   JPanel panel = new JPanel();
   JPanel panelGenero = new JPanel();
   JPanel panelTecnico = new JPanel();
@@ -90,6 +92,7 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
   Font fTResumen = new Font("Console", Font.PLAIN, 14);
 
   JButton btnPrestamo = new JButton("Prestar");
+  JButton btnUpdateLibro = new JButton("Actualizar Libro");
 
   JList<String> listasecuelas = new JList<String>();
   DefaultListModel dlm = new DefaultListModel();
@@ -116,7 +119,7 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
     lblCapTotales
   };
   JCheckBox[] jCheckBoxA = {ch1, ch2, ch3, ch4, ch5, ch6, ch7, ch8, ch9, ch10, ch11, ch12};
-  JButton[] jButtonA = {btnPrestamo};
+  JButton[] jButtonA = {btnPrestamo, btnUpdateLibro};
   JComponent[] jCompPprincipalA = {
     lblPortada, lblTitlo, lblAutor, panelGenero, lblResumen, txtASinopsis, tabbed
   };
@@ -146,11 +149,24 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
     panelEstado.setLayout(null);
     panelEntregas.setLayout(null);
 
-    btnPrestamo.setBounds(12, 550, 329, 30);
     lblPortada.setBounds(10, 30, 329, 512);
     lblTitlo.setBounds(350, 55, 500, 45);
     lblAutor.setBounds(350, 115, 500, 35);
     lblResumen.setBounds(350, 260, 100, 20);
+    btnPrestamo.setBounds(10, 550, 329, 30);
+    if (id_Usuario.equals("Admin")) {
+      btnPrestamo.setBounds(10, 550, 150, 30);
+      btnUpdateLibro.setBounds(190, 550, 150, 30);
+      panel.add(btnUpdateLibro);
+    }
+
+    btnUpdateLibro.addActionListener(
+        new ActionListener() {
+          @Override
+          public void actionPerformed(ActionEvent e) {
+            intfzActualizarLibro.iniciar(libro);
+          }
+        });
 
     lblTitlo.setFont(fTitulo);
     lblAutor.setFont(fAutor);
@@ -342,19 +358,22 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
     if (mensaje == 1) {
       JOptionPane.showMessageDialog(
           null, "Libro Prestado Correctamente", "Libro Prestado", JOptionPane.INFORMATION_MESSAGE);
-    } if (mensaje == 2) {
+    }
+    if (mensaje == 2) {
       JOptionPane.showMessageDialog(
           null,
           "Este usuario ya ha tomado prestado el limite maximo de 5 libros simultaneos ",
           "Advertencia",
           JOptionPane.INFORMATION_MESSAGE);
-    }  if (mensaje == 3) {
+    }
+    if (mensaje == 3) {
       JOptionPane.showMessageDialog(
           null,
           "El Prestamo no ha podido realizarse correctamente, por favor vuelva a intentarlo",
           "Prestamo Fallido",
           JOptionPane.INFORMATION_MESSAGE);
-    }  if (mensaje == 4) {
+    }
+    if (mensaje == 4) {
       JOptionPane.showMessageDialog(
           null,
           "Este Usuario ya tiene este libro en prestamo",

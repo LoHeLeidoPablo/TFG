@@ -29,13 +29,13 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
 
   MongoClientURI uri =
       new MongoClientURI(
-          "mongodb+srv://PabloBibTFG:7Infantes@biblioteca.w5wrr.mongodb.net/LoHeLeidoDB?retryWrites=true&w=majority");
+          "mongodb+srv://AdminUser:iReadIt@loheleido.idhnu.mongodb.net/LoHeLeidoDB?retryWrites=true&w=majority");
 
   MongoClient mongoClient = new MongoClient(uri);
   MongoDatabase DDBB = mongoClient.getDatabase("LoHeLeidoDB");
   MongoCollection<Document> collecLibro = DDBB.getCollection("Libro");
   MongoCollection<Document> collecDetLibro = DDBB.getCollection("DetallesPrestamo");
-  MongoCollection<Document> collecUsuario = DDBB.getCollection("usuario");
+  MongoCollection<Document> collecUsuario = DDBB.getCollection("Usuario");
 
   MongoCursor<Document> coleccion;
 
@@ -103,29 +103,29 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
 
   JPanel[] jPanelA = {panel, panelGenero, panelTecnico, panelEstado, panelEntregas};
   JLabel[] jLabelA = {
-    lblPortada,
-    lblTitlo,
-    lblAutor,
-    lblResumen,
-    lblGeneros,
-    lblPublicacion,
-    lblISBN,
-    lblCapitulos,
-    lblColeccion,
-    lblPublicacion,
-    lblEstado,
-    lblVistos,
-    lblNota,
-    lblCapTotales
+      lblPortada,
+      lblTitlo,
+      lblAutor,
+      lblResumen,
+      lblGeneros,
+      lblPublicacion,
+      lblISBN,
+      lblCapitulos,
+      lblColeccion,
+      lblPublicacion,
+      lblEstado,
+      lblVistos,
+      lblNota,
+      lblCapTotales
   };
   JCheckBox[] jCheckBoxA = {ch1, ch2, ch3, ch4, ch5, ch6, ch7, ch8, ch9, ch10, ch11, ch12};
   JButton[] jButtonA = {btnPrestamo, btnUpdateLibro};
   JComponent[] jCompPprincipalA = {
-    lblPortada, lblTitlo, lblAutor, panelGenero, lblResumen, txtASinopsis, tabbed
+      lblPortada, lblTitlo, lblAutor, panelGenero, lblResumen, txtASinopsis, tabbed
   };
   JComponent[] jCompPtecnicoA = {lblISBN, lblCapitulos, lblColeccion, lblPublicacion};
   JComponent[] jCompPestadoA = {
-    lblEstado, lblVistos, lblNota, cbEstados, spCapL, lblCapTotales, spNota, btnUpdate
+      lblEstado, lblVistos, lblNota, cbEstados, spCapL, lblCapTotales, spNota, btnUpdate
   };
 
   public IntfzInfoLibro() {

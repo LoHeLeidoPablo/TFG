@@ -18,12 +18,12 @@ public class IntfzRegistro extends JFrame {
 
   MongoClientURI uri =
       new MongoClientURI(
-          "mongodb+srv://PabloBibTFG:7Infantes@biblioteca.w5wrr.mongodb.net/LoHeLeidoDB?retryWrites=true&w=majority");
+          "mongodb+srv://AdminUser:iReadIt@loheleido.idhnu.mongodb.net/LoHeLeidoDB?retryWrites=true&w=majority");
 
   MongoClient mongoClient = new MongoClient(uri);
   MongoDatabase DDBB = mongoClient.getDatabase("LoHeLeidoDB");
   MongoCollection<Document> collecAuth = DDBB.getCollection("Auth");
-  MongoCollection<Document> collecUsuario = DDBB.getCollection("usuario");
+  MongoCollection<Document> collecUsuario = DDBB.getCollection("Usuario");
 
   IntfzLogin intfzLogin = new IntfzLogin();
 
@@ -47,41 +47,38 @@ public class IntfzRegistro extends JFrame {
 
   String contra1;
   String contra2;
-  Boolean existe = false;
+  Boolean existe;
+  Boolean obligatorios;
 
   JCheckBox cbVerPasswd = new JCheckBox("Mostrar Contraseñas");
-  JPanel[] jPanelA = {panel};
-  JLabel[] jLabelA = {
-    lblTituloProyecto, lblUsuario, lblEmail, lblPassword, lblPassword, lblPassword2
-  };
   JLabel[] jLabelObli = {lblObUsuario, lblObEmail, lblObPassword, lblObPassword2};
-  JButton[] jButtonA = {btnRegistro};
-  JTextField[] jTextFieldA = {txtUsuario, txtEmail, txtPassword, txtRepPassword};
   JComponent[] jComponentA = {
-    lblTituloProyecto,
-    lblUsuario,
-    lblEmail,
-    lblPassword,
-    lblPassword,
-    lblPassword2,
-    lblObUsuario,
-    lblObEmail,
-    lblObPassword,
-    lblObPassword2,
-    btnRegistro,
-    txtUsuario,
-    txtEmail,
-    txtPassword,
-    txtRepPassword,
-    cbVerPasswd
+      lblTituloProyecto,
+      lblUsuario,
+      lblEmail,
+      lblPassword,
+      lblPassword,
+      lblPassword2,
+      lblObUsuario,
+      lblObEmail,
+      lblObPassword,
+      lblObPassword2,
+      btnRegistro,
+      txtUsuario,
+      txtEmail,
+      txtPassword,
+      txtRepPassword,
+      cbVerPasswd
   };
 
   Font fuenteObligatoria = new Font(lblUsuario.getFont().getFamily(), Font.ITALIC, 9);
 
   public IntfzRegistro() {
     this.setResizable(false);
-  }
+    this.setLocation(100, 100);
 
+  }
+// TODO Implementar correo Email
   public void iniciar() {
     setTitle("Registrar - ¿Lo he leído?");
     getContentPane().setLayout(new GridLayout(1, 10));
@@ -116,8 +113,8 @@ public class IntfzRegistro extends JFrame {
     lblObPassword2.setBounds(10, 265, 255, 15);
 
     for (JLabel jLabel : jLabelObli) {
-      jLabel.setForeground(Color.red);
       jLabel.setVisible(false);
+      jLabel.setForeground(Color.red);
       jLabel.setFont(fuenteObligatoria);
     }
 
@@ -131,28 +128,10 @@ public class IntfzRegistro extends JFrame {
         new ActionListener() {
           @Override
           public void actionPerformed(ActionEvent e) {
-            contra1 = txtPassword.getText();
-            contra2 = txtRepPassword.getText();
-            if (!txtUsuario.getText().isEmpty()) {
-              if (!txtEmail.getText().isEmpty()) {
-                if (txtPassword.getText().length() >= 2) {
-                  if (contra1.equals(contra2)) {
-                    try {
-                      creacionUsuario();
-                    } catch (ParseException parseException) {
-                      parseException.printStackTrace();
-                    }
-                  } else {
-                    lblObPassword2.setVisible(true);
-                  }
-                } else {
-                  lblObPassword.setVisible(true);
-                }
-              } else {
-                lblObEmail.setVisible(true);
-              }
-            } else {
-              lblObUsuario.setVisible(true);
+            try {
+              creacionUsuario();
+            } catch (ParseException parseException) {
+              parseException.printStackTrace();
             }
           }
         });
@@ -161,37 +140,75 @@ public class IntfzRegistro extends JFrame {
 
     // Empaquetado, tamaño y visualizazion
     pack();
-    setSize(275, 385);
+    setSize(285, 385);
     setVisible(true);
   }
 
   public void creacionUsuario() throws ParseException {
-    if (existeUsuario() == false) {
-      Document auth = new Document();
-      auth.put("Nombre", txtUsuario.getText());
-      auth.put("Email", txtEmail.getText());
-      auth.put("Contraseña", txtPassword.getText());
-      collecAuth.insertOne(auth);
+    if (obligatorios() == true) {
+      if (existeUsuario() == false) {
+        Document auth = new Document();
+        auth.put("Nombre", txtUsuario.getText());
+        auth.put("Email", txtEmail.getText());
+        auth.put("Contraseña", txtPassword.getText());
+        collecAuth.insertOne(auth);
 
-      Document usuario = new Document();
-      usuario.put("Nombre", txtUsuario.getText());
-      usuario.put("Email", txtEmail.getText());
-      usuario.put("fCreacionCuenta", new Date());
-      usuario.put("NPrestados", 0);
-      collecUsuario.insertOne(usuario);
-      mensajeEmergente(1);
-      panel.setVisible(false);
-      dispose();
-
-      intfzLogin.iniciar();
-
-    } else {
-      mensajeEmergente(2);
-      existe = false;
+        Document usuario = new Document();
+        usuario.put("Nombre", txtUsuario.getText());
+        usuario.put("Email", txtEmail.getText());
+        usuario.put("fCreacionCuenta", new Date());
+        usuario.put("NPrestados", 0);
+        //usuario.put("Tema", "Claro");
+        collecUsuario.insertOne(usuario);
+        mensajeEmergente(1);
+        panel.setVisible(false);
+        dispose();
+        intfzLogin.iniciar();
+      } else {
+        mensajeEmergente(2);
+      }
     }
   }
 
+  public boolean obligatorios() {
+    contra1 = txtPassword.getText();
+    contra2 = txtRepPassword.getText();
+    int i = 0;
+    obligatorios = true;
+    if (!txtUsuario.getText().isEmpty()) {
+    } else {
+      lblObUsuario.setVisible(true);
+      i++;
+    }
+
+    if (!txtEmail.getText().isEmpty()) {
+    } else {
+      lblObEmail.setVisible(true);
+      i++;
+    }
+    if (txtPassword.getText().length() >= 2) {
+
+    } else {
+      lblObPassword.setVisible(true);
+      i++;
+    }
+
+    if (contra1.equals(contra2)) {
+    } else {
+      lblObPassword2.setVisible(true);
+      i++;
+    }
+
+    if (i == 0) {
+      obligatorios = true;
+    } else {
+      obligatorios = false;
+    }
+    return obligatorios;
+  }
+
   public boolean existeUsuario() {
+    existe = false;
     Document existeReg =
         collecAuth
             .find(or(eq("Nombre", txtUsuario.getText()), eq("Email", txtEmail.getText())))

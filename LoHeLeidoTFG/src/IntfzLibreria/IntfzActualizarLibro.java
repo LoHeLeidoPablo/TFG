@@ -28,8 +28,7 @@ public class IntfzActualizarLibro extends JFrame {
 
   MongoClientURI uri =
       new MongoClientURI(
-          "mongodb+srv://PabloBibTFG:7Infantes@biblioteca.w5wrr.mongodb.net/LoHeLeidoDB?retryWrites=true&w=majority");
-
+          "mongodb+srv://AdminUser:iReadIt@loheleido.idhnu.mongodb.net/LoHeLeidoDB?retryWrites=true&w=majority");
   MongoClient mongoClient = new MongoClient(uri);
   MongoDatabase DDBB = mongoClient.getDatabase("LoHeLeidoDB");
   MongoCollection<Document> collecLibros = DDBB.getCollection("Libro");
@@ -38,13 +37,14 @@ public class IntfzActualizarLibro extends JFrame {
   private JPanel panelGenero = new JPanel();
 
   private JLabel lblPortada = new JLabel("Portada: Tamaño Estandar --> 329 * 512");
-  private JLabel lblISBN = new JLabel("ISBN:");
+  private JLabel lblISBN = new JLabel("ISBN");
   private JLabel lblTitlo = new JLabel("Titulo");
   private JLabel lblAutor = new JLabel("Autor");
-  private JLabel lblCapitulos = new JLabel("Capitulos");
-  private JLabel lblColeccion = new JLabel("Saga:");
+  private JLabel lblColeccion = new JLabel("Saga");
   private JLabel lblNColeccion = new JLabel("Tomo");
-  private JLabel lblPublicacion = new JLabel("Fecha Publicacion:");
+  private JLabel lblPaginas = new JLabel("Paginas");
+  private JLabel lblCapitulos = new JLabel("Capitulos");
+  private JLabel lblPublicacion = new JLabel("F. Publicación");
   private JLabel lblGeneros = new JLabel("Genero");
   private JLabel lblResumen = new JLabel("Resumen");
 
@@ -55,6 +55,7 @@ public class IntfzActualizarLibro extends JFrame {
   private JTextField txtISBN = new JTextField();
   private JTextField txtColeccion = new JTextField();
   private JSpinner spCapitulos = new JSpinner(new SpinnerNumberModel(0, 0, 999, 1));
+  private JSpinner spPaginas = new JSpinner(new SpinnerNumberModel(0, 0, 9999, 1));
   private JSpinner spNColeccion = new JSpinner(new SpinnerNumberModel(0, 0, 999, 1));
 
   private JCheckBox ch1 = new JCheckBox("Aventuras");
@@ -82,28 +83,28 @@ public class IntfzActualizarLibro extends JFrame {
   String isbn = new String();
 
   JComponent[] jComponentA = {
-    panelGenero,
-    lblPortada,
-    lblISBN,
-    lblTitlo,
-    lblAutor,
-    lblColeccion,
-    lblResumen,
-    lblPublicacion,
-    lblISBN,
-    lblCapitulos,
-    lblNColeccion,
-    txtTitlo,
-    txtAutor,
-    txtGeneros,
-    txtISBN,
-    txtColeccion,
-    spCapitulos,
-    spNColeccion,
-    txtASinopsis,
-    btnAddPortada,
-    btnAddLibro,
-    datePublicacion
+      panelGenero,
+      lblPortada,
+      lblISBN,
+      lblTitlo,
+      lblAutor,
+      lblColeccion,
+      lblResumen,
+      lblPublicacion,
+      lblISBN,
+      lblCapitulos,
+      lblNColeccion,
+      txtTitlo,
+      txtAutor,
+      txtGeneros,
+      txtISBN,
+      txtColeccion,
+      spCapitulos,
+      spNColeccion,
+      txtASinopsis,
+      btnAddPortada,
+      btnAddLibro,
+      datePublicacion
   };
 
   public IntfzActualizarLibro() {
@@ -127,21 +128,23 @@ public class IntfzActualizarLibro extends JFrame {
     btnAddLibro.setBounds(10, 550, 160, 30);
     btnAddPortada.setBounds(179, 550, 160, 30);
 
-    lblISBN.setBounds(350, 45, 75, 20);
-    txtISBN.setBounds(425, 45, 500, 20);
-    lblTitlo.setBounds(350, 80, 75, 20);
-    txtTitlo.setBounds(425, 80, 500, 20);
-    lblAutor.setBounds(350, 115, 75, 20);
-    txtAutor.setBounds(425, 115, 500, 20);
-    lblColeccion.setBounds(350, 150, 75, 20);
-    txtColeccion.setBounds(425, 150, 500, 20);
+    lblISBN.setBounds(350, 45, 50, 20);
+    txtISBN.setBounds(400, 45, 525, 20);
+    lblTitlo.setBounds(350, 80, 50, 20);
+    txtTitlo.setBounds(400, 80, 525, 20);
+    lblAutor.setBounds(350, 115, 50, 20);
+    txtAutor.setBounds(400, 115, 525, 20);
+    lblColeccion.setBounds(350, 150, 50, 20);
+    txtColeccion.setBounds(400, 150, 525, 20);
 
-    lblNColeccion.setBounds(350, 185, 75, 20);
-    spNColeccion.setBounds(425, 185, 45, 20);
-    lblCapitulos.setBounds(495, 185, 75, 20);
-    spCapitulos.setBounds(570, 185, 45, 20);
-    lblPublicacion.setBounds(640, 185, 150, 20);
-    datePublicacion.setBounds(775, 185, 150, 20);
+    lblNColeccion.setBounds(350, 185, 50, 20);
+    spNColeccion.setBounds(400, 185, 45, 20);
+    lblPaginas.setBounds(460, 185, 50, 20);
+    spPaginas.setBounds(520, 185, 50, 20);
+    lblCapitulos.setBounds(585, 185, 53, 20);
+    spCapitulos.setBounds(650, 185, 45, 20);
+    lblPublicacion.setBounds(715, 185, 100, 20);
+    datePublicacion.setBounds(810, 185, 115, 20);
 
     panelGenero.setBounds(350, 215, 575, 85);
     panelGenero.setBorder(BorderFactory.createLineBorder(Color.darkGray, 1));
@@ -280,7 +283,7 @@ public class IntfzActualizarLibro extends JFrame {
     try {
       Mongo mongo =
           new Mongo(
-              "mongodb+srv://PabloBibTFG:7Infantes@biblioteca.w5wrr.mongodb.net/LoHeLeidoDB?retryWrites=true&w=majority");
+               "mongodb+srv://AdminUser:iReadIt@loheleido.idhnu.mongodb.net/LoHeLeidoDB?retryWrites=true&w=majority");
       DB db = mongo.getDB("LoHeLeidoDB");
       DBCollection collection = db.getCollection("Libros");
       String newFileName = txtTitlo.getText();

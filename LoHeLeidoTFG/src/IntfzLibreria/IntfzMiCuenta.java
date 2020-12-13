@@ -18,13 +18,13 @@ public class IntfzMiCuenta extends JFrame implements Interfaz {
 
   MongoClientURI uri =
       new MongoClientURI(
-          "mongodb+srv://PabloBibTFG:7Infantes@biblioteca.w5wrr.mongodb.net/LoHeLeidoDB?retryWrites=true&w=majority");
+           "mongodb+srv://AdminUser:iReadIt@loheleido.idhnu.mongodb.net/LoHeLeidoDB?retryWrites=true&w=majority");
 
   MongoClient mongoClient = new MongoClient(uri);
   MongoDatabase DDBB = mongoClient.getDatabase("LoHeLeidoDB");
   MongoCollection<Document> collecLibro = DDBB.getCollection("Libro");
   MongoCollection<Document> collecDetLibro = DDBB.getCollection("DetallesPrestamo");
-  MongoCollection<Document> collecUsuario = DDBB.getCollection("usuario");
+  MongoCollection<Document> collecUsuario = DDBB.getCollection("Usuario");
 
   JPanel panel = new JPanel();
   JPanel panelPrestamo = new JPanel();
@@ -106,14 +106,14 @@ public class IntfzMiCuenta extends JFrame implements Interfaz {
   int valorQuieroGris = 0;
 
   JPanel[] jPanelA = {
-    panel,
-    panelPrestamo,
-    panelPrestamo1,
-    panelPrestamo2,
-    panelPrestamo3,
-    panelPrestamo4,
-    panelPrestamo5,
-    panelEstadisticas
+      panel,
+      panelPrestamo,
+      panelPrestamo1,
+      panelPrestamo2,
+      panelPrestamo3,
+      panelPrestamo4,
+      panelPrestamo5,
+      panelEstadisticas
   };
 
   JComponent[] jComponentA = {panelPrestamo, panelEstadisticas};
@@ -293,7 +293,8 @@ public class IntfzMiCuenta extends JFrame implements Interfaz {
 
   }
 
-  public void devolverPrestamo(JButton jButton) {}
+  public void devolverPrestamo(JButton jButton) {
+  }
 
   private void crearComponentesEstadistica() {
     panelEstadisticas.setBounds(550, 100, 1000, 850);

@@ -24,7 +24,7 @@ public class IntfzPrincipal extends JFrame implements Interfaz {
 
   MongoClientURI uri =
       new MongoClientURI(
-          "mongodb+srv://PabloBibTFG:7Infantes@biblioteca.w5wrr.mongodb.net/LoHeLeidoDB?retryWrites=true&w=majority");
+           "mongodb+srv://AdminUser:iReadIt@loheleido.idhnu.mongodb.net/LoHeLeidoDB?retryWrites=true&w=majority");
 
   MongoClient mongoClient = new MongoClient(uri);
   MongoDatabase DDBB = mongoClient.getDatabase("LoHeLeidoDB");
@@ -46,16 +46,16 @@ public class IntfzPrincipal extends JFrame implements Interfaz {
   JPanel panel = new JPanel();
   JPanel[] jPanelA = {panel};
   JLabel[] jLabelA = {
-    lblportada1,
-    lblportada2,
-    lblportada3,
-    lblportada4,
-    lblportada5,
-    lblTitulo1,
-    lblTitulo2,
-    lblTitulo3,
-    lblTitulo4,
-    lblTitulo5
+      lblportada1,
+      lblportada2,
+      lblportada3,
+      lblportada4,
+      lblportada5,
+      lblTitulo1,
+      lblTitulo2,
+      lblTitulo3,
+      lblTitulo4,
+      lblTitulo5
   };
 
   public IntfzPrincipal() {

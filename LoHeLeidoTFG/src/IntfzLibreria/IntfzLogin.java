@@ -25,12 +25,12 @@ public class IntfzLogin extends JFrame {
 
   MongoClientURI uri =
       new MongoClientURI(
-          "mongodb+srv://PabloBibTFG:7Infantes@biblioteca.w5wrr.mongodb.net/LoHeLeidoDB?retryWrites=true&w=majority");
+          "mongodb+srv://AdminUser:iReadIt@loheleido.idhnu.mongodb.net/LoHeLeidoDB?retryWrites=true&w=majority");
 
   MongoClient mongoClient = new MongoClient(uri);
   MongoDatabase DDBB = mongoClient.getDatabase("LoHeLeidoDB");
   MongoCollection<Document> collecAuth = DDBB.getCollection("Auth");
-  MongoCollection<Document> collecUsuario = DDBB.getCollection("usuario");
+  MongoCollection<Document> collecUsuario = DDBB.getCollection("Usuario");
 
   JPanel panel = new JPanel();
 
@@ -44,27 +44,22 @@ public class IntfzLogin extends JFrame {
   JButton btnLogIn = new JButton("Iniciar Sesión");
   JCheckBox cbVerPasswd = new JCheckBox("Mostrar Contraseña");
 
-  boolean registrado = false;
-
   JComponent[] jComponentA = {
-    lblTituloProyecto,
-    lblUsuario,
-    txtUsuario,
-    lblPassword,
-    txtPassword,
-    cbVerPasswd,
-    lblRegistro,
-    btnLogIn
+      lblTituloProyecto,
+      lblUsuario,
+      txtUsuario,
+      lblPassword,
+      txtPassword,
+      cbVerPasswd,
+      lblRegistro,
+      btnLogIn
   };
-  JPanel[] jPanelA = {panel};
-  JLabel[] jLabelA = {lblUsuario, lblTituloProyecto, lblPassword, lblRegistro};
-  JButton[] jButtonA = {btnLogIn};
-  JTextField[] jTextFieldA = {txtUsuario, txtPassword};
 
   Font font = lblRegistro.getFont();
 
   public IntfzLogin() {
     this.setResizable(false);
+    this.setLocation(100,100);
   }
 
   public void iniciar() {
@@ -160,16 +155,15 @@ public class IntfzLogin extends JFrame {
                               eq("Email", usuAuth.getString("Email"))))
                       .first();
               if (UsuCuenta == null) {
-
                 UsuCuenta.put("Nombre", usuAuth.getString("Nombre"));
                 UsuCuenta.put("Email", usuAuth.getString("Email"));
                 UsuCuenta.put("fCreacionCuenta", new Date());
                 UsuCuenta.put("NPrestados", 0);
+                //UsuCuenta.put("Tema", "Claro");
                 collecUsuario.insertOne(UsuCuenta);
               }
               id_Usuario = UsuCuenta.getString("Nombre");
               dispose();
-              //menuUsuario.lblUsuario.setText(id_Usuario);
               intfzPrincipal.iniciar();
             } else {
               JOptionPane.showMessageDialog(
@@ -181,7 +175,6 @@ public class IntfzLogin extends JFrame {
           }
         });
     // TODO Relanzar Principal para que aparezca el usuario que acaba de iniciar sesion
-
 /*    menuUsuario = new Libreria.MenuUsuario(intfzPrincipal.panel,intfzPrincipal.jFramePrincipal,null);
        menuUsuario.repaint();
        intfzPrincipal.panel.repaint();
@@ -194,9 +187,5 @@ public class IntfzLogin extends JFrame {
     for (JComponent jComponent : jComponentA) {
       panel.add(jComponent);
     }
-  }
-
-  public void cambioTema(String color) {
-    Temas.cambioTema(color, null, null, null, null, null, null, null);
   }
 }

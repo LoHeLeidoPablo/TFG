@@ -62,5 +62,6 @@ public class IntfzMiBiblioteca extends JFrame implements Interfaz {
     Temas.cambioTema(color, jPanelA, null, null, null, myBibiblioTable, null, null);
   }
 
-  public void crearComponentes() {}
+  public void crearComponentes() {
+  }
 }

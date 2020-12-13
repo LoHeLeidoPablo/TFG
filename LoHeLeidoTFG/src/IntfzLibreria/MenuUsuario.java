@@ -14,11 +14,11 @@ public class MenuUsuario extends JFrame {
 
   MongoClientURI uri =
       new MongoClientURI(
-          "mongodb+srv://PabloBibTFG:7Infantes@biblioteca.w5wrr.mongodb.net/LoHeLeidoDB?retryWrites=true&w=majority");
+          "mongodb+srv://AdminUser:iReadIt@loheleido.idhnu.mongodb.net/LoHeLeidoDB?retryWrites=true&w=majority");
 
   MongoClient mongoClient = new MongoClient(uri);
   MongoDatabase DDBB = mongoClient.getDatabase("LoHeLeidoDB");
-  MongoCollection<Document> collecUsuario = DDBB.getCollection("usuario");
+  MongoCollection<Document> collecUsuario = DDBB.getCollection("Usuario");
 
   IntfzInfoLibro infoLibro = new IntfzInfoLibro();
   IntfzLogin intfzLogin = new IntfzLogin();
@@ -43,7 +43,8 @@ public class MenuUsuario extends JFrame {
   JPanel[] jPanelA = {panelMenuUsuario};
   JLabel[] jLabelA = {lblTituloProyecto, lblUsuario};
 
-  public MenuUsuario() {}
+  public MenuUsuario() {
+  }
 
   public MenuUsuario(JPanel jpanel, Interfaz interfazActiva) {
     this.interfazActiva = interfazActiva;
@@ -63,16 +64,16 @@ public class MenuUsuario extends JFrame {
     jpanel.add(panelMenuUsuario);
 
     String[] colores = {
-      "Claro",
-      "Oscuro",
-      "Amarillo Oscuro",
-      "Rojo Oscuro",
-      "Verde Oscuro",
-      "Azul Oscuro",
-      "Naranja Claro",
-      "Rojo Claro",
-      "Verde Claro",
-      "Azul Claro",
+        "Claro",
+        "Oscuro",
+        "Amarillo Oscuro",
+        "Rojo Oscuro",
+        "Verde Oscuro",
+        "Azul Oscuro",
+        "Naranja Claro",
+        "Rojo Claro",
+        "Verde Claro",
+        "Azul Claro",
     };
     lblUsuario.setText(IntfzLogin.UsuCuenta.getString("Nombre"));
     lblUsuario.setText(lblUsuario.getText() == null ? "Invitado" : lblUsuario.getText());

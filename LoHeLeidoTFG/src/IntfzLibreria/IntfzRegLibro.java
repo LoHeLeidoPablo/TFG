@@ -3,10 +3,12 @@ package IntfzLibreria;
 import com.mongodb.*;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-import com.mongodb.gridfs.GridFS;
-import com.mongodb.gridfs.GridFSInputFile;
+/*import com.mongodb.gridfs.GridFS;
+import com.mongodb.gridfs.GridFSInputFile;*/
 import com.toedter.calendar.JDateChooser;
+
 import static com.mongodb.client.model.Filters.eq;
+
 import org.bson.Document;
 
 import javax.swing.*;
@@ -23,7 +25,7 @@ public class IntfzRegLibro extends JFrame {
 
   MongoClientURI uri =
       new MongoClientURI(
-          "mongodb+srv://PabloBibTFG:7Infantes@biblioteca.w5wrr.mongodb.net/LoHeLeidoDB?retryWrites=true&w=majority");
+          "mongodb+srv://AdminUser:iReadIt@loheleido.idhnu.mongodb.net/LoHeLeidoDB?retryWrites=true&w=majority");
 
   MongoClient mongoClient = new MongoClient(uri);
   MongoDatabase DDBB = mongoClient.getDatabase("LoHeLeidoDB");
@@ -33,13 +35,14 @@ public class IntfzRegLibro extends JFrame {
   private JPanel panelGenero = new JPanel();
 
   private JLabel lblPortada = new JLabel("Portada: Tamaño Estandar --> 329 * 512");
-  private JLabel lblISBN = new JLabel("ISBN:");
+  private JLabel lblISBN = new JLabel("ISBN");
   private JLabel lblTitlo = new JLabel("Titulo");
   private JLabel lblAutor = new JLabel("Autor");
-  private JLabel lblCapitulos = new JLabel("Capitulos");
-  private JLabel lblColeccion = new JLabel("Saga:");
+  private JLabel lblColeccion = new JLabel("Saga");
   private JLabel lblNColeccion = new JLabel("Tomo");
-  private JLabel lblPublicacion = new JLabel("Fecha Publicacion:");
+  private JLabel lblPaginas = new JLabel("Paginas");
+  private JLabel lblCapitulos = new JLabel("Capitulos");
+  private JLabel lblPublicacion = new JLabel("F. Publicación");
   private JLabel lblGeneros = new JLabel("Genero");
   private JLabel lblResumen = new JLabel("Resumen");
 
@@ -50,6 +53,7 @@ public class IntfzRegLibro extends JFrame {
   private JTextField txtISBN = new JTextField();
   private JTextField txtColeccion = new JTextField();
   private JSpinner spCapitulos = new JSpinner(new SpinnerNumberModel(0, 0, 999, 1));
+  private JSpinner spPaginas = new JSpinner(new SpinnerNumberModel(0, 0, 9999, 1));
   private JSpinner spNColeccion = new JSpinner(new SpinnerNumberModel(0, 0, 999, 1));
 
   private JCheckBox ch1 = new JCheckBox("Aventuras");
@@ -73,31 +77,32 @@ public class IntfzRegLibro extends JFrame {
   Font fuente = new Font(lblGeneros.getFont().getFamily(), Font.BOLD, 12);
   File archivo;
   JCheckBox[] jCheckBoxA = {ch1, ch2, ch3, ch4, ch5, ch6, ch7, ch8, ch9, ch10, ch11, ch12};
-  Boolean existe = false;
 
   JComponent[] jComponentA = {
-    panelGenero,
-    lblPortada,
-    lblISBN,
-    lblTitlo,
-    lblAutor,
-    lblColeccion,
-    lblResumen,
-    lblPublicacion,
-    lblISBN,
-    lblCapitulos,
-    lblNColeccion,
-    txtTitlo,
-    txtAutor,
-    txtGeneros,
-    txtISBN,
-    txtColeccion,
-    spCapitulos,
-    spNColeccion,
-    txtASinopsis,
-    btnAddPortada,
-    btnAddLibro,
-    datePublicacion
+      panelGenero,
+      lblPortada,
+      lblISBN,
+      lblTitlo,
+      lblAutor,
+      lblColeccion,
+      lblResumen,
+      lblPublicacion,
+      lblISBN,
+      lblCapitulos,
+      lblPaginas,
+      lblNColeccion,
+      txtTitlo,
+      txtAutor,
+      txtGeneros,
+      txtISBN,
+      txtColeccion,
+      spCapitulos,
+      spPaginas,
+      spNColeccion,
+      txtASinopsis,
+      btnAddPortada,
+      btnAddLibro,
+      datePublicacion
   };
 
   public IntfzRegLibro() {
@@ -107,8 +112,9 @@ public class IntfzRegLibro extends JFrame {
   public void iniciar() {
     setTitle("Registrar libro - ¿Lo he leído?");
     getContentPane().setLayout(new GridLayout(1, 10));
-    añadirPortada();
     crearComponentes();
+    añadirPortada();
+    registrarLibro();
 
     panel.setLayout(null);
     panelGenero.setLayout(null);
@@ -119,21 +125,23 @@ public class IntfzRegLibro extends JFrame {
     btnAddLibro.setBounds(10, 550, 160, 30);
     btnAddPortada.setBounds(179, 550, 160, 30);
 
-    lblISBN.setBounds(350, 45, 75, 20);
-    txtISBN.setBounds(425, 45, 500, 20);
-    lblTitlo.setBounds(350, 80, 75, 20);
-    txtTitlo.setBounds(425, 80, 500, 20);
-    lblAutor.setBounds(350, 115, 75, 20);
-    txtAutor.setBounds(425, 115, 500, 20);
-    lblColeccion.setBounds(350, 150, 75, 20);
-    txtColeccion.setBounds(425, 150, 500, 20);
+    lblISBN.setBounds(350, 45, 50, 20);
+    txtISBN.setBounds(400, 45, 525, 20);
+    lblTitlo.setBounds(350, 80, 50, 20);
+    txtTitlo.setBounds(400, 80, 525, 20);
+    lblAutor.setBounds(350, 115, 50, 20);
+    txtAutor.setBounds(400, 115, 525, 20);
+    lblColeccion.setBounds(350, 150, 50, 20);
+    txtColeccion.setBounds(400, 150, 525, 20);
 
-    lblNColeccion.setBounds(350, 185, 75, 20);
-    spNColeccion.setBounds(425, 185, 45, 20);
-    lblCapitulos.setBounds(495, 185, 75, 20);
-    spCapitulos.setBounds(570, 185, 45, 20);
-    lblPublicacion.setBounds(640, 185, 150, 20);
-    datePublicacion.setBounds(775, 185, 150, 20);
+    lblNColeccion.setBounds(350, 185, 50, 20);
+    spNColeccion.setBounds(400, 185, 45, 20);
+    lblPaginas.setBounds(460, 185, 50, 20);
+    spPaginas.setBounds(520, 185, 50, 20);
+    lblCapitulos.setBounds(585, 185, 53, 20);
+    spCapitulos.setBounds(650, 185, 45, 20);
+    lblPublicacion.setBounds(715, 185, 100, 20);
+    datePublicacion.setBounds(810, 185, 115, 20);
 
     panelGenero.setBounds(350, 215, 575, 85);
     panelGenero.setBorder(BorderFactory.createLineBorder(Color.darkGray, 1));
@@ -170,59 +178,80 @@ public class IntfzRegLibro extends JFrame {
     setVisible(true);
   }
 
-  public void registroLibro() {
-    if (existeLibro() == false) {
-      ArrayList<String> valoresCB = new ArrayList<String>();
-      for (JCheckBox jCheckBox : jCheckBoxA) {
-        if (jCheckBox.isSelected()) {
-          valoresCB.add(jCheckBox.getText());
+  public void registrarLibro() {
+    btnAddLibro.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        if (obligatorios() == true) {
+          if (existeLibro() == false) {
+            añadirLibro();
+            mensajeEmergente(1);
+          } else {
+            mensajeEmergente(2);
+          }
         }
       }
-      String resumen = txtASinopsis.getText();
-      try {
-        Document libro = new Document();
-        guardarPortada();
-        libro.put("ISBN", txtISBN.getText());
-        libro.put("Titulo", txtTitlo.getText());
-        libro.put("Autor", txtAutor.getText());
-        libro.put("Saga", txtColeccion.getText());
-        libro.put("Tomo", (Integer) spNColeccion.getValue());
-        libro.put("Capitulos", (Integer) spCapitulos.getValue());
-        libro.put("f_publicacion", datePublicacion.getDate());
-        libro.put("Generos", valoresCB);
-        libro.put("Sinopsis", txtASinopsis.getText());
-        libro.put("f_registro", new Date());
-        collecLibros.insertOne(libro);
-        mensajeEmergente(1);
-      } catch (Exception e) {
-        mensajeEmergente(2);
+    });
+
+  }
+
+  public void añadirLibro() {
+    Integer Tomo = (Integer) spNColeccion.getValue();
+    Integer Capitulo = (Integer) spCapitulos.getValue();
+    ArrayList<String> valoresCB = new ArrayList<String>();
+    for (JCheckBox jCheckBox : jCheckBoxA) {
+      if (jCheckBox.isSelected()) {
+        valoresCB.add(jCheckBox.getText());
       }
-    } else {
-      mensajeEmergente(2);
-      existe = false;
+    }
+    String resumen = txtASinopsis.getText();
+    try {
+      Document libro = new Document();
+      // guardarPortada();
+      libro.put("ISBN", txtISBN.getText());
+      libro.put("Titulo", txtTitlo.getText());
+      libro.put("Autor", txtAutor.getText());
+      libro.put("Saga", txtColeccion.getText());
+      libro.put("Tomo", Tomo);
+      libro.put("Capitulos", Capitulo);
+      libro.put("f_publicacion", datePublicacion.getDate());
+      libro.put("Generos", valoresCB);
+      libro.put("Sinopsis", txtASinopsis.getText());
+      libro.put("f_registro", new Date());
+      collecLibros.insertOne(libro);
+    } catch (Exception e) {
     }
   }
 
   public boolean existeLibro() {
-    Document existeLibro = collecLibros.find(eq("ISBN", txtISBN)).first();
-    if (existeLibro == null) {
+    Boolean existe = false;
+    try {
+      Document existeLibro = collecLibros.find(eq("ISBN", txtISBN)).first();
+      if (existeLibro != null) existe = true;
+    } catch (Exception e) {
       existe = true;
+      //mensajeEmergente(10);
     }
     return existe;
   }
 
-  public boolean obligatorios() {
-    if (txtISBN.getText().isEmpty()) {}
-    if (txtAutor.getText().isEmpty()) {}
-    if (txtColeccion.getText().isEmpty()) {}
 
-    // if(spNColeccion.getValue().equals(0));
-    // if(spNColeccion.getValue().equals(0));
+  public boolean obligatorios() {
+    int i = 0;
+    if (txtISBN.getText().length() < 9 | txtISBN.getText().length() > 14) i++;
+    if (txtTitlo.getText().isEmpty()) i++;
+    if (txtAutor.getText().isEmpty()) i++;
+    if (txtColeccion.getText().isEmpty()) i++;
+    if (spPaginas.getValue().equals(0) & spCapitulos.getValue().equals(0)) i++;
+    //TODO Mensajes de respuesta en caso de que se haya olvidado de un campo obligatorio
+    if (i > 0) {
+      mensajeEmergente(10);
+      return false;
+    }
     return true;
   }
 
   public void crearComponentes() {
-
     for (JComponent jComponent : jComponentA) {
       panel.add(jComponent);
     }
@@ -263,12 +292,12 @@ public class IntfzRegLibro extends JFrame {
         });
   }
 
-  public void guardarPortada() {
+/*  public void guardarPortada() {
     // TODO Hacerlo funcionar
     try {
       Mongo mongo =
           new Mongo(
-              "mongodb+srv://PabloBibTFG:7Infantes@biblioteca.w5wrr.mongodb.net/LoHeLeidoDB?retryWrites=true&w=majority");
+              "mongodb+srv://AdminUser:iReadIt@loheleido.idhnu.mongodb.net/LoHeLeidoDB?retryWrites=true&w=majority");
       DB db = mongo.getDB("LoHeLeidoDB");
       DBCollection collection = db.getCollection("Libros");
       String newFileName = txtTitlo.getText();
@@ -286,7 +315,7 @@ public class IntfzRegLibro extends JFrame {
       gfsFile.save();
     } catch (Exception ex) {
     }
-  }
+  }*/
 
   public void mensajeEmergente(int mensaje) {
 
@@ -296,9 +325,11 @@ public class IntfzRegLibro extends JFrame {
           "Libro añadido Correctamente",
           "Registro Completado",
           JOptionPane.INFORMATION_MESSAGE);
-    } else {
+    } else if (mensaje == 10) {
+      JOptionPane.showMessageDialog(
+          null, "FALLO", "Registro Fallido", JOptionPane.ERROR_MESSAGE);
+    } else
       JOptionPane.showMessageDialog(
           null, "Este Libro ya esta registrado", "Registro Fallido", JOptionPane.ERROR_MESSAGE);
-    }
   }
 }

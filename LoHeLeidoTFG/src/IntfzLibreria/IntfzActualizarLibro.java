@@ -112,7 +112,7 @@ public class IntfzActualizarLibro extends JFrame {
   }
 
   public void iniciar(Document actualizarLibro) {
-    setTitle("Registrar libro - ¿Lo he leído?");
+    setTitle("Actualizar libro - ¿Lo he leído?");
     getContentPane().setLayout(new GridLayout(1, 10));
     crearComponentes();
     if (actualizarLibro != null)
@@ -236,14 +236,19 @@ public class IntfzActualizarLibro extends JFrame {
     }
   }
 
-/*
-  public boolean obligatorios() {
-    if (txtISBN.getText().isEmpty()) {}
-    if (txtAutor.getText().isEmpty()) {}
-    if (txtColeccion.getText().isEmpty()) {}
 
-    // if(spNColeccion.getValue().equals(0));
-    // if(spNColeccion.getValue().equals(0));
+  public boolean obligatorios() {
+    int i = 0;
+    if (txtISBN.getText().length() < 9 | txtISBN.getText().length() > 14) i++;
+    if (txtTitlo.getText().isEmpty()) i++;
+    if (txtAutor.getText().isEmpty()) i++;
+    if (txtColeccion.getText().isEmpty()) i++;
+    if (spPaginas.getValue().equals(0) & spCapitulos.getValue().equals(0)) i++;
+    //TODO Mensajes de respuesta en caso de que se haya olvidado de un campo obligatorio
+    if (i > 0) {
+      mensajeEmergente(10);
+      return false;
+    }
     return true;
   }
 
@@ -279,7 +284,7 @@ public class IntfzActualizarLibro extends JFrame {
         });
   }
 
-  public void guardarPortada() {
+  /*public void guardarPortada() {
     try {
       Mongo mongo =
           new Mongo(

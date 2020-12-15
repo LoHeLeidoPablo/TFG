@@ -1,10 +1,9 @@
 package IntfzLibreria;
 
-import com.mongodb.*;
+import com.mongodb.MongoClient;
+import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
-/*import com.mongodb.gridfs.GridFS;
-import com.mongodb.gridfs.GridFSInputFile;*/
 import com.toedter.calendar.JDateChooser;
 
 import static com.mongodb.client.model.Filters.eq;
@@ -19,7 +18,6 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 public class IntfzRegLibro extends JFrame {
 
@@ -30,6 +28,8 @@ public class IntfzRegLibro extends JFrame {
   MongoClient mongoClient = new MongoClient(uri);
   MongoDatabase DDBB = mongoClient.getDatabase("LoHeLeidoDB");
   MongoCollection<Document> collecLibros = DDBB.getCollection("Libro");
+
+  IntfzInfoLibro intfzInfoLibro = new IntfzInfoLibro();
 
   private JPanel panel = new JPanel();
   private JPanel panelGenero = new JPanel();
@@ -46,7 +46,7 @@ public class IntfzRegLibro extends JFrame {
   private JLabel lblGeneros = new JLabel("Genero");
   private JLabel lblResumen = new JLabel("Resumen");
 
-  private JTextField txtTitlo = new JTextField();
+  private JTextField txtTitulo = new JTextField();
   private JTextField txtAutor = new JTextField();
   private JTextArea txtASinopsis = new JTextArea();
   private JTextField txtGeneros = new JTextField();
@@ -91,7 +91,7 @@ public class IntfzRegLibro extends JFrame {
       lblCapitulos,
       lblPaginas,
       lblNColeccion,
-      txtTitlo,
+      txtTitulo,
       txtAutor,
       txtGeneros,
       txtISBN,
@@ -128,7 +128,7 @@ public class IntfzRegLibro extends JFrame {
     lblISBN.setBounds(350, 45, 50, 20);
     txtISBN.setBounds(400, 45, 525, 20);
     lblTitlo.setBounds(350, 80, 50, 20);
-    txtTitlo.setBounds(400, 80, 525, 20);
+    txtTitulo.setBounds(400, 80, 525, 20);
     lblAutor.setBounds(350, 115, 50, 20);
     txtAutor.setBounds(400, 115, 525, 20);
     lblColeccion.setBounds(350, 150, 50, 20);
@@ -207,9 +207,9 @@ public class IntfzRegLibro extends JFrame {
     String resumen = txtASinopsis.getText();
     try {
       Document libro = new Document();
-      // guardarPortada();
+      //guardarPortada();
       libro.put("ISBN", txtISBN.getText());
-      libro.put("Titulo", txtTitlo.getText());
+      libro.put("Titulo", txtTitulo.getText());
       libro.put("Autor", txtAutor.getText());
       libro.put("Saga", txtColeccion.getText());
       libro.put("Tomo", Tomo);
@@ -219,6 +219,7 @@ public class IntfzRegLibro extends JFrame {
       libro.put("Sinopsis", txtASinopsis.getText());
       libro.put("f_registro", new Date());
       collecLibros.insertOne(libro);
+      intfzInfoLibro.iniciar(libro);
     } catch (Exception e) {
     }
   }
@@ -226,22 +227,26 @@ public class IntfzRegLibro extends JFrame {
   public boolean existeLibro() {
     Boolean existe = false;
     try {
-      Document existeLibro = collecLibros.find(eq("ISBN", txtISBN)).first();
-      if (existeLibro != null) existe = true;
+      Document existeLibro = collecLibros.find(eq("ISBN", txtISBN.getText())).first();
+      if (existeLibro != null) {
+        existe = true;
+       intfzInfoLibro.iniciar(existeLibro);
+      }
     } catch (Exception e) {
       existe = true;
-      //mensajeEmergente(10);
     }
     return existe;
   }
 
-
   public boolean obligatorios() {
     int i = 0;
-    if (txtISBN.getText().length() < 9 | txtISBN.getText().length() > 14) i++;
-    if (txtTitlo.getText().isEmpty()) i++;
+    if (txtISBN.getText().length() < 10 | txtISBN.getText().length() > 13) i++;
+    if (txtTitulo.getText().isEmpty()) i++;
     if (txtAutor.getText().isEmpty()) i++;
-    if (txtColeccion.getText().isEmpty()) i++;
+    if (txtColeccion.getText().isEmpty()){
+      txtColeccion.setText(txtTitulo.getText());
+      if (spNColeccion.getValue().equals(0)) spNColeccion.setValue(spNColeccion.getNextValue());
+    }
     if (spPaginas.getValue().equals(0) & spCapitulos.getValue().equals(0)) i++;
     //TODO Mensajes de respuesta en caso de que se haya olvidado de un campo obligatorio
     if (i > 0) {
@@ -292,28 +297,29 @@ public class IntfzRegLibro extends JFrame {
         });
   }
 
-/*  public void guardarPortada() {
+ /* public void guardarPortada() {
     // TODO Hacerlo funcionar
     try {
       Mongo mongo =
           new Mongo(
               "mongodb+srv://AdminUser:iReadIt@loheleido.idhnu.mongodb.net/LoHeLeidoDB?retryWrites=true&w=majority");
       DB db = mongo.getDB("LoHeLeidoDB");
-      DBCollection collection = db.getCollection("Libros");
-      String newFileName = txtTitlo.getText();
-
+      DBCollection collection = db.getCollection("Libro");
+      String newFileName = txtTitulo.getText();
       // create a "photo" namespace
       GridFS gfsPhoto = new GridFS(db, "portada");
-
       // get image file from local drive
       GridFSInputFile gfsFile = gfsPhoto.createFile(archivo);
-
       // set a new filename for identify purpose
       gfsFile.setFilename(newFileName);
-
       // save the image file into mongoDB
       gfsFile.save();
     } catch (Exception ex) {
+      JOptionPane.showMessageDialog(
+          null,
+          "No Encuentra Colleccion",
+          "Registro Completado",
+          JOptionPane.INFORMATION_MESSAGE);
     }
   }*/
 
@@ -327,9 +333,9 @@ public class IntfzRegLibro extends JFrame {
           JOptionPane.INFORMATION_MESSAGE);
     } else if (mensaje == 10) {
       JOptionPane.showMessageDialog(
-          null, "FALLO", "Registro Fallido", JOptionPane.ERROR_MESSAGE);
+          null, "El ISBN, el Titulo, el Autor y las Paginas o los Capitulos son campos obligatorios", "Registro Fallido", JOptionPane.ERROR_MESSAGE);
     } else
       JOptionPane.showMessageDialog(
-          null, "Este Libro ya esta registrado", "Registro Fallido", JOptionPane.ERROR_MESSAGE);
+          null, "Ya existe un libro con este ISBN, esta es la informacion del libro relacionado a este ISBN ", "Registro Fallido", JOptionPane.ERROR_MESSAGE);
   }
 }

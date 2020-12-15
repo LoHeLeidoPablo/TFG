@@ -150,8 +150,8 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
     panelEntregas.setLayout(null);
 
     lblPortada.setBounds(10, 30, 329, 512);
-    lblTitlo.setBounds(350, 55, 500, 45);
-    lblAutor.setBounds(350, 115, 500, 35);
+    lblTitlo.setBounds(350, 55, 950, 45);
+    lblAutor.setBounds(350, 115, 575, 35);
     lblResumen.setBounds(350, 260, 100, 20);
     btnPrestamo.setBounds(10, 550, 329, 30);
     if (id_Usuario.equals("Admin")) {
@@ -248,7 +248,6 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
     } else {
       setTitle(lblTitlo.getText());
     }
-
     lblAutor.setText(libro.getString("Autor"));
     lstGeneros = (List<Document>) libro.get("Generos");
     for (int k = 0, i = 0; k < jCheckBoxA.length; k++) {

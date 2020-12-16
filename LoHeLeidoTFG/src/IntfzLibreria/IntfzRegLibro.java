@@ -6,6 +6,7 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.toedter.calendar.JDateChooser;
 
+import static IntfzLibreria.IntfzLogin.id_Usuario;
 import static com.mongodb.client.model.Filters.eq;
 
 import org.bson.Document;
@@ -182,6 +183,7 @@ public class IntfzRegLibro extends JFrame {
     btnAddLibro.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
+        sinEspacios();
         if (obligatorios() == true) {
           if (existeLibro() == false) {
             añadirLibro();
@@ -197,14 +199,26 @@ public class IntfzRegLibro extends JFrame {
 
   public void añadirLibro() {
     Integer Tomo = (Integer) spNColeccion.getValue();
-    Integer Capitulo = (Integer) spCapitulos.getValue();
+    Integer Capitulo;
+    Integer Pagina;
+
+    if (spCapitulos.getValue().equals(0)) {
+      Capitulo = null;
+    } else {
+      Capitulo = (Integer) spCapitulos.getValue();
+    }
+    if (spPaginas.getValue().equals(0)) {
+      Pagina = null;
+    } else {
+      Pagina = (Integer) spPaginas.getValue();
+    }
+
     ArrayList<String> valoresCB = new ArrayList<String>();
     for (JCheckBox jCheckBox : jCheckBoxA) {
       if (jCheckBox.isSelected()) {
         valoresCB.add(jCheckBox.getText());
       }
     }
-    String resumen = txtASinopsis.getText();
     try {
       Document libro = new Document();
       //guardarPortada();
@@ -213,11 +227,13 @@ public class IntfzRegLibro extends JFrame {
       libro.put("Autor", txtAutor.getText());
       libro.put("Saga", txtColeccion.getText());
       libro.put("Tomo", Tomo);
+      libro.put("Paginas", Pagina);
       libro.put("Capitulos", Capitulo);
       libro.put("f_publicacion", datePublicacion.getDate());
       libro.put("Generos", valoresCB);
       libro.put("Sinopsis", txtASinopsis.getText());
       libro.put("f_registro", new Date());
+      libro.put("creadorDelRegistro", id_Usuario);
       collecLibros.insertOne(libro);
       intfzInfoLibro.iniciar(libro);
     } catch (Exception e) {
@@ -229,8 +245,7 @@ public class IntfzRegLibro extends JFrame {
     try {
       Document existeLibro = collecLibros.find(eq("ISBN", txtISBN.getText())).first();
       if (existeLibro != null) {
-        existe = true;
-       intfzInfoLibro.iniciar(existeLibro);
+        existe = true;intfzInfoLibro.iniciar(existeLibro);
       }
     } catch (Exception e) {
       existe = true;
@@ -254,6 +269,13 @@ public class IntfzRegLibro extends JFrame {
       return false;
     }
     return true;
+  }
+
+  public void sinEspacios(){
+    txtISBN.setText(txtISBN.getText().trim());
+    txtTitulo.setText(txtTitulo.getText().trim());
+    txtAutor.setText(txtAutor.getText().trim());
+    txtColeccion.setText(txtColeccion.getText().trim());
   }
 
   public void crearComponentes() {

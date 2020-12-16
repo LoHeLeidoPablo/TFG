@@ -8,10 +8,10 @@ import java.awt.font.TextAttribute;
 import java.util.Map;
 
 public class PanelBusqueda extends JFrame {
-  private JPanel panelBusqueda;
-  private JComboBox<String> tipoBusqueda;
-  private JTextField txtBusqueda;
-  private JLabel lblnewBook =
+   JPanel panelBusqueda;
+   JComboBox<String> tipoBusqueda;
+   JTextField txtBusqueda;
+   JLabel lblnewBook =
       new JLabel(
           "No encunetra el libro que busca en nuestra IntfzLibreria, pulse aqui para añadirlo.");
   ;
@@ -79,6 +79,8 @@ public class PanelBusqueda extends JFrame {
           }
         });
   }
+
+  public void busqueda(){}
 
   public void cambioTema(String color) {
     Temas.cambioTema(color, jPanelA, null, jTextFieldA, null, null, null, null);

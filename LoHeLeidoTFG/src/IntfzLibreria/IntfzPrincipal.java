@@ -160,9 +160,11 @@ public class IntfzPrincipal extends JFrame implements Interfaz {
         new MouseAdapter() {
           @Override
           public void mouseClicked(MouseEvent e) {
+            if (panelBusqueda.panelBusqueda.isVisible() == false) {
             libro = collecLibro.find(eq("Titulo", jLabel.getText())).first();
             intfzInfoLibro.dispose();
             intfzInfoLibro.iniciar(libro);
+            }
           }
         });
   }

@@ -72,7 +72,7 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
   JLabel lblISBN = new JLabel("ISBN: ");
   JLabel lblCapitulos = new JLabel("Capitulos:");
   JLabel lblColeccion = new JLabel("Saga: ");
-  JLabel lblPublicacion = new JLabel("Fecha Publicacion: ");
+  JLabel lblPublicacion = new JLabel("Fecha Publicacion:");
 
   JLabel lblEstado = new JLabel("Estado:");
   JLabel lblVistos = new JLabel("Caps leídos:");
@@ -248,6 +248,7 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
     } else {
       setTitle(lblTitlo.getText());
     }
+
     lblAutor.setText(libro.getString("Autor"));
     lstGeneros = (List<Document>) libro.get("Generos");
     for (int k = 0, i = 0; k < jCheckBoxA.length; k++) {
@@ -257,15 +258,21 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
         if (i == lstGeneros.size()) break;
       }
     }
-
     txtASinopsis.setText(libro.getString("Sinopsis"));
     lblColeccion.setText("Saga: " + libro.getString("Saga") + "  " + libro.getInteger("Tomo"));
     lblCapitulos.setText("Capitulos: " + libro.getInteger("Capitulos"));
-    SimpleDateFormat sdf = new SimpleDateFormat("dd - MMMM - yyyy");
-    lblPublicacion.setText("Fecha de Publicación: " + sdf.format(libro.getDate("f_publicacion")));
+    if (libro.getDate("f_publicacion") != null) {
+      SimpleDateFormat sdf = new SimpleDateFormat("dd - MMMM - yyyy");
+      lblPublicacion.setText("Fecha de Publicación: " + sdf.format(libro.getDate("f_publicacion")));
+    }
+    if (libro.getInteger("Capitulos") != null) {
     valMaximio = libro.getInteger("Capitulos");
     spCapL.setModel(new SpinnerNumberModel(0, 0, valMaximio, 1));
     lblCapTotales.setText("/" + valMaximio);
+  }else{
+      spCapL.setModel(new SpinnerNumberModel(0, 0, 999, 1));
+      lblCapTotales.setText("/???");
+    }
     dlm.clear();
     coleccion =
         collecLibro

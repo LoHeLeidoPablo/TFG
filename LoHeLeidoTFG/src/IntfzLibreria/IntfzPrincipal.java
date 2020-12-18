@@ -7,10 +7,12 @@ import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.net.URL;
 
 import static com.mongodb.client.model.Filters.*;
 import static com.mongodb.client.model.Projections.*;
@@ -19,7 +21,6 @@ import static com.mongodb.client.model.Sorts.*;
 public class IntfzPrincipal extends JFrame implements Interfaz {
 
   MenuUsuario menuUsuario;
-  PanelBusqueda panelBusqueda;
   IntfzInfoLibro intfzInfoLibro = new IntfzInfoLibro();
 
   MongoClientURI uri =
@@ -55,7 +56,6 @@ public class IntfzPrincipal extends JFrame implements Interfaz {
   JLabel lblTitulo10 = new JLabel("Titulo Portada10");
   JLabel lblTitulo11 = new JLabel("Titulo Portada11");
   JLabel lblTitulo12 = new JLabel("Titulo Portada12");
-
 
   Document libro;
 
@@ -97,13 +97,12 @@ public class IntfzPrincipal extends JFrame implements Interfaz {
     setTitle("¿Lo he leído?");
     getContentPane().setLayout(new GridLayout(1, 10));
     menuUsuario = new MenuUsuario(panel, this);
-    panelBusqueda = new PanelBusqueda(panel);
     crearComponentes();
     panel.setLayout(null);
     for (JLabel jLabel : jLabelA) {
       irLibro(jLabel);
     }
-    ultimosAgregados();
+
 
     lblportada1.setBounds(37, 100, 210, 332);
     lblTitulo1.setBounds(lblportada1.getX(), lblportada1.getY() + lblportada1.getHeight() + 25, lblportada1.getWidth(), 25);
@@ -130,6 +129,8 @@ public class IntfzPrincipal extends JFrame implements Interfaz {
     lblTitulo11.setBounds(lblportada11.getX(), lblTitulo7.getY(), lblportada1.getWidth(), lblTitulo1.getHeight());
     lblTitulo12.setBounds(lblportada12.getX(), lblTitulo7.getY(), lblportada1.getWidth(), lblTitulo1.getHeight());
 
+    ultimosAgregados();
+
     getContentPane().add(panel);
 
     // Empaquetado, tamaño y visualizazion
@@ -143,14 +144,38 @@ public class IntfzPrincipal extends JFrame implements Interfaz {
         collecLibro
             .find()
             .sort(descending("f_registro"))
-            .projection(include("Titulo"))
+            .projection(include("Titulo","PortadaURL"))
             .limit(12)
             .iterator();
     int pos = -1;
+    String urlPortada = new String();
     while (ultimoAgregados.hasNext()) {
       pos++;
       Document titulos = ultimoAgregados.next();
-      jLabelA[pos].setText(titulos.get("Titulo").toString());
+      urlPortada = titulos.getString("PortadaURL");
+      try {
+        URL url = new URL(urlPortada);
+        Image portada = ImageIO.read(url);
+     ImageIcon portadaIco = new ImageIcon(portada);
+        Icon icono =
+            new ImageIcon(
+                portadaIco
+                    .getImage()
+                    .getScaledInstance(
+                        lblportada1.getWidth(),
+                        lblportada1.getHeight(),
+                        Image.SCALE_SMOOTH));
+
+        System.out.println( icono.getIconHeight() + " - W:"+  icono.getIconWidth());
+        jLabelA[pos].setIcon(icono);
+        jLabelA[pos].setText("");
+        repaint();
+       // jLabelA[pos].setIcon(new ImageIcon(portada));
+      //  jLabelA[pos + 12].setText(titulos.get("Titulo").toString());
+     } catch (Exception ex) {
+        System.out.println(ex.getMessage());
+        jLabelA[pos].setText(titulos.get("Titulo").toString());
+      }
       jLabelA[pos + 12].setText(titulos.get("Titulo").toString());
     }
   }
@@ -160,10 +185,10 @@ public class IntfzPrincipal extends JFrame implements Interfaz {
         new MouseAdapter() {
           @Override
           public void mouseClicked(MouseEvent e) {
-            if (panelBusqueda.panelBusqueda.isVisible() == false) {
-            libro = collecLibro.find(eq("Titulo", jLabel.getText())).first();
-            intfzInfoLibro.dispose();
-            intfzInfoLibro.iniciar(libro);
+            if (menuUsuario.panelBusqueda.isVisible() == false) {
+              libro = collecLibro.find(eq("Titulo", jLabel.getText())).first();
+              intfzInfoLibro.dispose();
+              intfzInfoLibro.iniciar(libro);
             }
           }
         });

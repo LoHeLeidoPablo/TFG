@@ -127,7 +127,6 @@ public class IntfzMiCuenta extends JFrame implements Interfaz {
     setTitle("¿Lo he leído? - Mi Cuenta");
     getContentPane().setLayout(new GridLayout(1, 10));
     MenuUsuario menuUsuario = new MenuUsuario(panel, this);
-    PanelBusqueda panelBusqueda = new PanelBusqueda(panel);
 
     panel.setLayout(null);
     panelPrestamo.setLayout(new GridLayout(5, 1));

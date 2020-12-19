@@ -11,12 +11,14 @@ import static com.mongodb.client.model.Filters.eq;
 
 import org.bson.Document;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -35,9 +37,9 @@ public class IntfzRegLibro extends JFrame {
   private JPanel panel = new JPanel();
   private JPanel panelGenero = new JPanel();
 
-  private JLabel lblPortada = new JLabel("Portada: Tamaño Estandar --> 329 * 512");
+  private JLabel lblPortada = new JLabel("Portada:");
   private JLabel lblISBN = new JLabel("ISBN");
-  private JLabel lblTitlo = new JLabel("Titulo");
+  private JLabel lblTitulo = new JLabel("Titulo");
   private JLabel lblAutor = new JLabel("Autor");
   private JLabel lblColeccion = new JLabel("Saga");
   private JLabel lblNColeccion = new JLabel("Tomo");
@@ -46,13 +48,14 @@ public class IntfzRegLibro extends JFrame {
   private JLabel lblPublicacion = new JLabel("F. Publicación");
   private JLabel lblGeneros = new JLabel("Genero");
   private JLabel lblResumen = new JLabel("Resumen");
+  private JLabel lblPortadaURL = new JLabel("URL de la Portada");
 
+  private JTextField txtISBN = new JTextField();
   private JTextField txtTitulo = new JTextField();
   private JTextField txtAutor = new JTextField();
-  private JTextArea txtASinopsis = new JTextArea();
-  private JTextField txtGeneros = new JTextField();
-  private JTextField txtISBN = new JTextField();
   private JTextField txtColeccion = new JTextField();
+  private JTextArea txtASinopsis = new JTextArea();
+  private JTextField txtURL = new JTextField();
   private JSpinner spCapitulos = new JSpinner(new SpinnerNumberModel(0, 0, 999, 1));
   private JSpinner spPaginas = new JSpinner(new SpinnerNumberModel(0, 0, 9999, 1));
   private JSpinner spNColeccion = new JSpinner(new SpinnerNumberModel(0, 0, 999, 1));
@@ -70,20 +73,18 @@ public class IntfzRegLibro extends JFrame {
   private JCheckBox ch11 = new JCheckBox("Comic/Manga");
   private JCheckBox ch12 = new JCheckBox("Otros");
 
-  private JButton btnAddPortada = new JButton("Añadir Portada");
   private JButton btnAddLibro = new JButton("Guardar Libro");
-  private JFileChooser fcAddPortada = new JFileChooser();
   private JDateChooser datePublicacion = new JDateChooser();
+  private JScrollPane scrollPane = new JScrollPane(txtASinopsis);
 
   Font fuente = new Font(lblGeneros.getFont().getFamily(), Font.BOLD, 12);
-  File archivo;
   JCheckBox[] jCheckBoxA = {ch1, ch2, ch3, ch4, ch5, ch6, ch7, ch8, ch9, ch10, ch11, ch12};
 
   JComponent[] jComponentA = {
       panelGenero,
       lblPortada,
       lblISBN,
-      lblTitlo,
+      lblTitulo,
       lblAutor,
       lblColeccion,
       lblResumen,
@@ -92,16 +93,16 @@ public class IntfzRegLibro extends JFrame {
       lblCapitulos,
       lblPaginas,
       lblNColeccion,
+      lblPortadaURL,
       txtTitulo,
       txtAutor,
-      txtGeneros,
       txtISBN,
       txtColeccion,
       spCapitulos,
       spPaginas,
       spNColeccion,
-      txtASinopsis,
-      btnAddPortada,
+      scrollPane,
+      txtURL,
       btnAddLibro,
       datePublicacion
   };
@@ -114,8 +115,8 @@ public class IntfzRegLibro extends JFrame {
     setTitle("Registrar libro - ¿Lo he leído?");
     getContentPane().setLayout(new GridLayout(1, 10));
     crearComponentes();
-    añadirPortada();
     registrarLibro();
+    insertarP();
 
     panel.setLayout(null);
     panelGenero.setLayout(null);
@@ -123,12 +124,11 @@ public class IntfzRegLibro extends JFrame {
     lblPortada.setHorizontalAlignment(SwingConstants.CENTER);
     lblPortada.setBorder(BorderFactory.createLineBorder(Color.black));
     lblPortada.setBounds(10, 30, 329, 512);
-    btnAddLibro.setBounds(10, 550, 160, 30);
-    btnAddPortada.setBounds(179, 550, 160, 30);
+    btnAddLibro.setBounds(10, 550, 328, 30);
 
     lblISBN.setBounds(350, 45, 50, 20);
     txtISBN.setBounds(400, 45, 525, 20);
-    lblTitlo.setBounds(350, 80, 50, 20);
+    lblTitulo.setBounds(350, 80, 50, 20);
     txtTitulo.setBounds(400, 80, 525, 20);
     lblAutor.setBounds(350, 115, 50, 20);
     txtAutor.setBounds(400, 115, 525, 20);
@@ -164,12 +164,16 @@ public class IntfzRegLibro extends JFrame {
     ch12.setBounds(410, 60, 134, 20);
 
     lblResumen.setBounds(350, 310, 100, 15);
-    txtASinopsis.setBounds(350, 325, 575, 255);
+    scrollPane.setBounds(350, 325, 575, 217);
+    txtASinopsis.setBounds(0, 0, scrollPane.getWidth(), scrollPane.getHeight());
+    scrollPane.setBackground(panel.getBackground());
+
+    lblPortadaURL.setBounds(350, 550, 115, 30);
+    txtURL.setBounds(465, 550, 460, 30);
+
     txtASinopsis.setLineWrap(true);
     txtASinopsis.setWrapStyleWord(true);
     txtASinopsis.setEditable(true);
-
-    ImageIcon portadaIco;
 
     getContentPane().add(panel);
 
@@ -221,7 +225,6 @@ public class IntfzRegLibro extends JFrame {
     }
     try {
       Document libro = new Document();
-      //guardarPortada();
       libro.put("ISBN", txtISBN.getText());
       libro.put("Titulo", txtTitulo.getText());
       libro.put("Autor", txtAutor.getText());
@@ -233,6 +236,7 @@ public class IntfzRegLibro extends JFrame {
       libro.put("Generos", valoresCB);
       libro.put("Sinopsis", txtASinopsis.getText());
       libro.put("f_registro", new Date());
+      libro.put("PortadaURL", txtURL.getText());
       libro.put("creadorDelRegistro", id_Usuario);
       collecLibros.insertOne(libro);
       intfzInfoLibro.iniciar(libro);
@@ -245,7 +249,8 @@ public class IntfzRegLibro extends JFrame {
     try {
       Document existeLibro = collecLibros.find(eq("ISBN", txtISBN.getText())).first();
       if (existeLibro != null) {
-        existe = true;intfzInfoLibro.iniciar(existeLibro);
+        existe = true;
+        intfzInfoLibro.iniciar(existeLibro);
       }
     } catch (Exception e) {
       existe = true;
@@ -258,11 +263,12 @@ public class IntfzRegLibro extends JFrame {
     if (txtISBN.getText().length() < 10 | txtISBN.getText().length() > 13) i++;
     if (txtTitulo.getText().isEmpty()) i++;
     if (txtAutor.getText().isEmpty()) i++;
-    if (txtColeccion.getText().isEmpty()){
+    if (txtColeccion.getText().isEmpty()) {
       txtColeccion.setText(txtTitulo.getText());
       if (spNColeccion.getValue().equals(0)) spNColeccion.setValue(spNColeccion.getNextValue());
     }
     if (spPaginas.getValue().equals(0) & spCapitulos.getValue().equals(0)) i++;
+    if(lblPortada.getIcon() == null) i++;
     //TODO Mensajes de respuesta en caso de que se haya olvidado de un campo obligatorio
     if (i > 0) {
       mensajeEmergente(10);
@@ -271,11 +277,12 @@ public class IntfzRegLibro extends JFrame {
     return true;
   }
 
-  public void sinEspacios(){
+  public void sinEspacios() {
     txtISBN.setText(txtISBN.getText().trim());
     txtTitulo.setText(txtTitulo.getText().trim());
     txtAutor.setText(txtAutor.getText().trim());
     txtColeccion.setText(txtColeccion.getText().trim());
+    txtURL.setText(txtURL.getText().trim());
   }
 
   public void crearComponentes() {
@@ -287,63 +294,51 @@ public class IntfzRegLibro extends JFrame {
     }
   }
 
-  public void añadirPortada() {
-    btnAddPortada.addActionListener(
-        new ActionListener() {
-          @Override
-          public void actionPerformed(ActionEvent e) {
-            FileNameExtensionFilter formato =
-                new FileNameExtensionFilter("JPG y PNG,", "jpg", "png");
-            fcAddPortada.setFileFilter(formato);
-            int resultado = fcAddPortada.showOpenDialog(null);
-            if (JFileChooser.APPROVE_OPTION == resultado) {
-              archivo = fcAddPortada.getSelectedFile();
-
-              try {
-                ImageIcon portadaIco = new ImageIcon(archivo.toString());
-                Icon icono =
-                    new ImageIcon(
-                        portadaIco
-                            .getImage()
-                            .getScaledInstance(
-                                lblPortada.getWidth(),
-                                lblPortada.getHeight(),
-                                Image.SCALE_DEFAULT));
-                lblPortada.setIcon(icono);
-                lblPortada.setBorder(null);
-              } catch (Exception ex) {
-                JOptionPane.showMessageDialog(null, "Error al abrir: " + ex);
-              }
-            }
-          }
-        });
+  public void insertarP() {
+    EscuchaPortada insertarP = new EscuchaPortada();
+    javax.swing.text.Document url = txtURL.getDocument();
+    url.addDocumentListener(insertarP);
   }
 
- /* public void guardarPortada() {
-    // TODO Hacerlo funcionar
-    try {
-      Mongo mongo =
-          new Mongo(
-              "mongodb+srv://AdminUser:iReadIt@loheleido.idhnu.mongodb.net/LoHeLeidoDB?retryWrites=true&w=majority");
-      DB db = mongo.getDB("LoHeLeidoDB");
-      DBCollection collection = db.getCollection("Libro");
-      String newFileName = txtTitulo.getText();
-      // create a "photo" namespace
-      GridFS gfsPhoto = new GridFS(db, "portada");
-      // get image file from local drive
-      GridFSInputFile gfsFile = gfsPhoto.createFile(archivo);
-      // set a new filename for identify purpose
-      gfsFile.setFilename(newFileName);
-      // save the image file into mongoDB
-      gfsFile.save();
-    } catch (Exception ex) {
-      JOptionPane.showMessageDialog(
-          null,
-          "No Encuentra Colleccion",
-          "Registro Completado",
-          JOptionPane.INFORMATION_MESSAGE);
+  private class EscuchaPortada implements DocumentListener {
+    @Override
+    public void insertUpdate(DocumentEvent e) {
+      añadirPortada();
     }
-  }*/
+
+    @Override
+    public void removeUpdate(DocumentEvent e) {
+      //añadirPortada();
+      lblPortada.setIcon(null);
+
+    }
+
+    @Override
+    public void changedUpdate(DocumentEvent e) {
+// Este no es necesario para el funcionamiento de la app
+    }
+  }
+
+  public void añadirPortada() {
+    try {
+      URL url = new URL(txtURL.getText());
+      Image portada = ImageIO.read(url);
+      ImageIcon portadaIco = new ImageIcon(portada);
+      Icon icono =
+          new ImageIcon(
+              portadaIco
+                  .getImage()
+                  .getScaledInstance(
+                      lblPortada.getWidth(),
+                      lblPortada.getHeight(),
+                      Image.SCALE_DEFAULT));
+      lblPortada.setIcon(icono);
+      lblPortada.setBorder(null);
+      repaint();
+    } catch (Exception ex) {
+      JOptionPane.showMessageDialog(null, "Error: No se ha podido abrir la imagen de la URL => " + txtURL.getText());
+    }
+  }
 
   public void mensajeEmergente(int mensaje) {
 

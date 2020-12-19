@@ -13,12 +13,14 @@ import static com.mongodb.client.model.Projections.*;
 import static com.mongodb.client.model.Sorts.*;
 import static com.mongodb.client.model.Updates.*;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.Calendar;
@@ -100,6 +102,7 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
 
   String colecc = new String();
   String isbn = new String();
+  String urlPortada = new String();
 
   JPanel[] jPanelA = {panel, panelGenero, panelTecnico, panelEstado, panelEntregas};
   JLabel[] jLabelA = {
@@ -138,6 +141,7 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
     if (libro != null) {
       colecc = libro.getString("Saga");
       isbn = libro.getString("ISBN");
+      urlPortada = libro.getString("PortadaURL");
       mostrarInfoLibro(libro);
     }
 
@@ -150,13 +154,12 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
     panelEntregas.setLayout(null);
 
     lblPortada.setBounds(10, 30, 329, 512);
-    lblTitlo.setBounds(350, 55, 950, 45);
-    lblAutor.setBounds(350, 115, 575, 35);
-    lblResumen.setBounds(350, 260, 100, 20);
-    btnPrestamo.setBounds(10, 550, 329, 30);
+    lblTitlo.setBounds(lblPortada.getX()+lblPortada.getWidth()+11, 55, 950, 45);
+    lblAutor.setBounds(lblTitlo.getX(), lblTitlo.getY()+lblTitlo.getHeight() + 20, 575, 35);
+    lblResumen.setBounds(lblTitlo.getX(), 260, 100, 20);
+    btnPrestamo.setBounds(lblPortada.getX(), lblPortada.getY()+ lblPortada.getHeight() + 8, lblPortada.getWidth(), 30);
     if (id_Usuario.equals("Admin")) {
-      btnPrestamo.setBounds(10, 550, 150, 30);
-      btnUpdateLibro.setBounds(190, 550, 150, 30);
+      btnUpdateLibro.setBounds(btnPrestamo.getBounds());
       panel.add(btnUpdateLibro);
     }
 
@@ -164,7 +167,7 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
         new ActionListener() {
           @Override
           public void actionPerformed(ActionEvent e) {
-            intfzActualizarLibro.iniciar(libro);
+            // intfzActualizarLibro.iniciar(libro);
           }
         });
 
@@ -195,7 +198,7 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
     txtASinopsis.setBackground(panel.getBackground());
     txtASinopsis.setFont(fTResumen);
 
-    lblPortada.setBorder(BorderFactory.createLineBorder(Color.black));
+   lblPortada.setBorder(BorderFactory.createLineBorder(Color.black));
     panelGenero.setBorder(BorderFactory.createLineBorder(Color.darkGray));
 
     tabbed.setBounds(950, 135, 350, 125);
@@ -240,6 +243,7 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
   }
 
   public void mostrarInfoLibro(Document libro) {
+    añadirPortada();
     lblISBN.setText("ISBN: " + libro.getString("ISBN"));
     lblTitlo.setText(libro.getString("Titulo"));
 
@@ -266,10 +270,10 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
       lblPublicacion.setText("Fecha de Publicación: " + sdf.format(libro.getDate("f_publicacion")));
     }
     if (libro.getInteger("Capitulos") != null) {
-    valMaximio = libro.getInteger("Capitulos");
-    spCapL.setModel(new SpinnerNumberModel(0, 0, valMaximio, 1));
-    lblCapTotales.setText("/" + valMaximio);
-  }else{
+      valMaximio = libro.getInteger("Capitulos");
+      spCapL.setModel(new SpinnerNumberModel(0, 0, valMaximio, 1));
+      lblCapTotales.setText("/" + valMaximio);
+    } else {
       spCapL.setModel(new SpinnerNumberModel(0, 0, 999, 1));
       lblCapTotales.setText("/???");
     }
@@ -288,6 +292,28 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
     }
     listasecuelas.setModel(dlm);
     isbn = libro.getString("ISBN");
+  }
+
+  public void añadirPortada() {
+    try {
+   URL url = new URL(urlPortada);
+      Image portada = ImageIO.read(url);
+      ImageIcon portadaIco = new ImageIcon(portada);
+      Icon icono =
+          new ImageIcon(
+              portadaIco
+                  .getImage()
+                  .getScaledInstance(
+                      lblPortada.getWidth(),
+                      lblPortada.getHeight(),
+                      Image.SCALE_DEFAULT));
+     lblPortada.setIcon(icono);
+    lblPortada.setBorder(null);
+    repaint();
+
+    } catch (Exception ex) {
+      JOptionPane.showMessageDialog(null, "Lo Sentimos, no es posible mostrar la portada de este ejemplar" + urlPortada);
+    }
   }
 
   public void cambiarTomo() {

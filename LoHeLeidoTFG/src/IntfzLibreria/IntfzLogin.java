@@ -59,7 +59,7 @@ public class IntfzLogin extends JFrame {
 
   public IntfzLogin() {
     this.setResizable(false);
-    this.setLocation(100,100);
+    this.setLocation(100, 100);
   }
 
   public void iniciar() {

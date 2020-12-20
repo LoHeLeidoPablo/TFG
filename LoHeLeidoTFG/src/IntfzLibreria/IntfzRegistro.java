@@ -53,22 +53,22 @@ public class IntfzRegistro extends JFrame {
   JCheckBox cbVerPasswd = new JCheckBox("Mostrar Contraseñas");
   JLabel[] jLabelObli = {lblObUsuario, lblObEmail, lblObPassword, lblObPassword2};
   JComponent[] jComponentA = {
-      lblTituloProyecto,
-      lblUsuario,
-      lblEmail,
-      lblPassword,
-      lblPassword,
-      lblPassword2,
-      lblObUsuario,
-      lblObEmail,
-      lblObPassword,
-      lblObPassword2,
-      btnRegistro,
-      txtUsuario,
-      txtEmail,
-      txtPassword,
-      txtRepPassword,
-      cbVerPasswd
+    lblTituloProyecto,
+    lblUsuario,
+    lblEmail,
+    lblPassword,
+    lblPassword,
+    lblPassword2,
+    lblObUsuario,
+    lblObEmail,
+    lblObPassword,
+    lblObPassword2,
+    btnRegistro,
+    txtUsuario,
+    txtEmail,
+    txtPassword,
+    txtRepPassword,
+    cbVerPasswd
   };
 
   Font fuenteObligatoria = new Font(lblUsuario.getFont().getFamily(), Font.ITALIC, 9);
@@ -76,9 +76,8 @@ public class IntfzRegistro extends JFrame {
   public IntfzRegistro() {
     this.setResizable(false);
     this.setLocation(100, 100);
-
   }
-// TODO Implementar correo Email
+  // TODO Implementar correo Email
   public void iniciar() {
     setTitle("Registrar - ¿Lo he leído?");
     getContentPane().setLayout(new GridLayout(1, 10));
@@ -158,7 +157,7 @@ public class IntfzRegistro extends JFrame {
         usuario.put("Email", txtEmail.getText());
         usuario.put("fCreacionCuenta", new Date());
         usuario.put("NPrestados", 0);
-        //usuario.put("Tema", "Claro");
+        // usuario.put("Tema", "Claro");
         collecUsuario.insertOne(usuario);
         mensajeEmergente(1);
         panel.setVisible(false);

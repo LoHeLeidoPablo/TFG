@@ -45,14 +45,14 @@ public class IntfzLogin extends JFrame {
   JCheckBox cbVerPasswd = new JCheckBox("Mostrar Contraseña");
 
   JComponent[] jComponentA = {
-      lblTituloProyecto,
-      lblUsuario,
-      txtUsuario,
-      lblPassword,
-      txtPassword,
-      cbVerPasswd,
-      lblRegistro,
-      btnLogIn
+    lblTituloProyecto,
+    lblUsuario,
+    txtUsuario,
+    lblPassword,
+    txtPassword,
+    cbVerPasswd,
+    lblRegistro,
+    btnLogIn
   };
 
   Font font = lblRegistro.getFont();
@@ -159,7 +159,7 @@ public class IntfzLogin extends JFrame {
                 UsuCuenta.put("Email", usuAuth.getString("Email"));
                 UsuCuenta.put("fCreacionCuenta", new Date());
                 UsuCuenta.put("NPrestados", 0);
-                //UsuCuenta.put("Tema", "Claro");
+                // UsuCuenta.put("Tema", "Claro");
                 collecUsuario.insertOne(UsuCuenta);
               }
               id_Usuario = UsuCuenta.getString("Nombre");
@@ -175,7 +175,7 @@ public class IntfzLogin extends JFrame {
           }
         });
     // TODO Relanzar Principal para que aparezca el usuario que acaba de iniciar sesion
-/*    menuUsuario = new Libreria.MenuUsuario(intfzPrincipal.panel,intfzPrincipal.jFramePrincipal,null);
+    /*    menuUsuario = new Libreria.MenuUsuario(intfzPrincipal.panel,intfzPrincipal.jFramePrincipal,null);
        menuUsuario.repaint();
        intfzPrincipal.panel.repaint();
        intfzPrincipal.cerrarVentana();

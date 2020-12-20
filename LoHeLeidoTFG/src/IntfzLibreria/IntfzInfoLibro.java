@@ -22,7 +22,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -56,6 +55,7 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
   JLabel lblGeneros = new JLabel("Genero");
   JLabel lblResumen = new JLabel("Resumen");
   JTextArea txtASinopsis = new JTextArea(loreIpsum());
+  JScrollPane scrollPaneResumen = new JScrollPane(txtASinopsis);
 
   JCheckBox ch1 = new JCheckBox("Aventuras");
   JCheckBox ch2 = new JCheckBox("Autobiografía");
@@ -73,20 +73,32 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
 
   JLabel lblISBN = new JLabel("ISBN: ");
   JLabel lblCapitulos = new JLabel("Capitulos:");
+  JLabel lblPaginas = new JLabel("Paginas:");
   JLabel lblColeccion = new JLabel("Saga: ");
   JLabel lblPublicacion = new JLabel("Fecha Publicacion:");
 
   JLabel lblEstado = new JLabel("Estado:");
-  JLabel lblVistos = new JLabel("Caps leídos:");
+  JLabel lblCapsLeidos = new JLabel("Caps leídos:");
+  JLabel lblPagsLeidas = new JLabel("Pags leídas:");
   JLabel lblNota = new JLabel("Nota:");
+  JLabel lblVecesRele = new JLabel("Veces");
 
   String[] estados = {"Sin Añadir", "Leyendo", "Leído", "Abandonado", "Quiero Leer"};
   JComboBox<String> cbEstados = new JComboBox<String>(estados);
-  int valMaximio = 50;
-  JSpinner spCapL = new JSpinner(new SpinnerNumberModel(0, 0, valMaximio, 1));
-  JLabel lblCapTotales = new JLabel("/" + valMaximio);
+  JCheckBox jchReleido = new JCheckBox("Releido");
+  JSpinner spVecesRele = new JSpinner(new SpinnerNumberModel(0, 0, 99, 1));
+  int valMaximoCaps = 50;
+  JSpinner spCapL = new JSpinner(new SpinnerNumberModel(0, 0, valMaximoCaps, 1));
+  JLabel lblCapTotales = new JLabel("/" + valMaximoCaps);
+  int valMaximoPags = 500;
+  JSpinner spPagL = new JSpinner(new SpinnerNumberModel(0, 0, valMaximoPags, 1));
+  JLabel lblPagTotales = new JLabel("/" + valMaximoPags);
   JSpinner spNota = new JSpinner(new SpinnerNumberModel(0.0, 0.0, 10.0, 0.1));
   JButton btnUpdate = new JButton("Actualizar");
+  JButton btnCancelar =
+      new JButton(
+          "Cancelar"); // Este boton devuelve los datos a como esta guardado en la base de datos |
+  // si es nul lo devuelve al estado base
 
   Font fTitulo = new Font("Console", Font.BOLD, 40);
   Font fAutor = new Font("Console", Font.ITALIC, 30);
@@ -98,7 +110,7 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
 
   JList<String> listasecuelas = new JList<String>();
   DefaultListModel dlm = new DefaultListModel();
-  JScrollPane scrollPane = new JScrollPane(listasecuelas);
+  JScrollPane scrollPaneSecuelas = new JScrollPane(listasecuelas);
 
   String colecc = new String();
   String isbn = new String();
@@ -106,44 +118,54 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
 
   JPanel[] jPanelA = {panel, panelGenero, panelTecnico, panelEstado, panelEntregas};
   JLabel[] jLabelA = {
-      lblPortada,
-      lblTitlo,
-      lblAutor,
-      lblResumen,
-      lblGeneros,
-      lblPublicacion,
-      lblISBN,
-      lblCapitulos,
-      lblColeccion,
-      lblPublicacion,
-      lblEstado,
-      lblVistos,
-      lblNota,
-      lblCapTotales
+    lblPortada,
+    lblTitlo,
+    lblAutor,
+    lblResumen,
+    lblGeneros,
+    lblPublicacion,
+    lblISBN,
+    lblCapitulos,
+    lblPaginas,
+    lblColeccion,
+    lblPublicacion,
+    lblEstado,
+    lblCapsLeidos,
+    lblNota,
+    lblCapTotales
   };
   JCheckBox[] jCheckBoxA = {ch1, ch2, ch3, ch4, ch5, ch6, ch7, ch8, ch9, ch10, ch11, ch12};
   JButton[] jButtonA = {btnPrestamo, btnUpdateLibro};
   JComponent[] jCompPprincipalA = {
-      lblPortada, lblTitlo, lblAutor, panelGenero, lblResumen, txtASinopsis, tabbed
+    lblPortada, lblTitlo, lblAutor, panelGenero, lblResumen, scrollPaneResumen, tabbed
   };
-  JComponent[] jCompPtecnicoA = {lblISBN, lblCapitulos, lblColeccion, lblPublicacion};
+  JComponent[] jCompPtecnicoA = {lblISBN, lblCapitulos, lblPaginas, lblColeccion, lblPublicacion};
   JComponent[] jCompPestadoA = {
-      lblEstado, lblVistos, lblNota, cbEstados, spCapL, lblCapTotales, spNota, btnUpdate
+    lblEstado,
+    cbEstados,
+    jchReleido,
+    lblVecesRele,
+    spVecesRele,
+    lblCapsLeidos,
+    spCapL,
+    lblCapTotales,
+    lblPagsLeidas,
+    spPagL,
+    lblPagTotales,
+    lblNota,
+    spNota,
+    btnUpdate,
+    btnCancelar
   };
 
   public IntfzInfoLibro() {
     this.setResizable(false);
+    repeticion();
     cambiarTomo();
     prestarLibro();
   }
 
   public void iniciar(Document libro) {
-    if (libro != null) {
-      colecc = libro.getString("Saga");
-      isbn = libro.getString("ISBN");
-      urlPortada = libro.getString("PortadaURL");
-      mostrarInfoLibro(libro);
-    }
 
     getContentPane().setLayout(new GridLayout(1, 15));
     crearComponentes();
@@ -154,10 +176,14 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
     panelEntregas.setLayout(null);
 
     lblPortada.setBounds(10, 30, 329, 512);
-    lblTitlo.setBounds(lblPortada.getX()+lblPortada.getWidth()+11, 55, 950, 45);
-    lblAutor.setBounds(lblTitlo.getX(), lblTitlo.getY()+lblTitlo.getHeight() + 20, 575, 35);
+    lblTitlo.setBounds(lblPortada.getX() + lblPortada.getWidth() + 11, 55, 950, 45);
+    lblAutor.setBounds(lblTitlo.getX(), lblTitlo.getY() + lblTitlo.getHeight() + 20, 575, 35);
     lblResumen.setBounds(lblTitlo.getX(), 260, 100, 20);
-    btnPrestamo.setBounds(lblPortada.getX(), lblPortada.getY()+ lblPortada.getHeight() + 8, lblPortada.getWidth(), 30);
+    btnPrestamo.setBounds(
+        lblPortada.getX(),
+        lblPortada.getY() + lblPortada.getHeight() + 8,
+        lblPortada.getWidth(),
+        30);
     if (id_Usuario.equals("Admin")) {
       btnUpdateLibro.setBounds(btnPrestamo.getBounds());
       panel.add(btnUpdateLibro);
@@ -191,17 +217,20 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
     ch11.setBounds(410, 40, 134, 20);
     ch12.setBounds(410, 60, 134, 20);
 
-    txtASinopsis.setBounds(350, 285, 950, 257);
+    scrollPaneResumen.setBounds(350, 285, 950, 280);
+    scrollPaneResumen.setBorder(null);
+    txtASinopsis.setBounds(0, 0, scrollPaneResumen.getWidth(), scrollPaneResumen.getHeight());
     txtASinopsis.setLineWrap(true);
     txtASinopsis.setWrapStyleWord(true);
     txtASinopsis.setEditable(false);
+    scrollPaneResumen.setBackground(panel.getBackground());
     txtASinopsis.setBackground(panel.getBackground());
     txtASinopsis.setFont(fTResumen);
 
-   lblPortada.setBorder(BorderFactory.createLineBorder(Color.black));
+    lblPortada.setBorder(BorderFactory.createLineBorder(Color.black));
     panelGenero.setBorder(BorderFactory.createLineBorder(Color.darkGray));
 
-    tabbed.setBounds(950, 135, 350, 125);
+    tabbed.setBounds(950, 100, 350, 150);
     tabbed.addTab("Ficha Tecnica", panelTecnico);
     if (id_Usuario.equals("Invitado")) {
     } else {
@@ -212,37 +241,64 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
 
     panelTecnico.setBounds(0, 0, tabbed.getWidth(), tabbed.getHeight());
     lblISBN.setBounds(10, 10, 420, 15);
-    lblCapitulos.setBounds(10, 30, 420, 15);
-    lblColeccion.setBounds(10, 50, 420, 15);
-    lblPublicacion.setBounds(10, 70, 420, 15);
+    lblCapitulos.setBounds(
+        lblISBN.getX(), lblISBN.getY() + 22, lblISBN.getWidth(), lblISBN.getHeight());
+    lblPaginas.setBounds(
+        lblISBN.getX(), lblCapitulos.getY() + 22, lblISBN.getWidth(), lblISBN.getHeight());
+    lblColeccion.setBounds(
+        lblISBN.getX(), lblPaginas.getY() + 22, lblISBN.getWidth(), lblISBN.getHeight());
+    lblPublicacion.setBounds(
+        lblISBN.getX(), lblColeccion.getY() + 22, lblISBN.getWidth(), lblISBN.getHeight());
 
     panelEstado.setBounds(panelTecnico.getBounds());
     lblEstado.setBounds(10, 10, 55, 20);
-    cbEstados.setBounds(70, 10, 130, 20);
-    lblVistos.setBounds(10, 40, 95, 20);
-    spCapL.setBounds(110, 40, 50, 20);
-    lblCapTotales.setBounds(160, 40, 50, 20);
-    lblNota.setBounds(10, 70, 50, 20);
-    spNota.setBounds(60, 70, 50, 20);
-    btnUpdate.setBounds(210, 50, 125, 40);
+    cbEstados.setBounds(70, 10, 100, 20);
+    jchReleido.setBounds(210, 10, 75, 20);
+    spVecesRele.setBounds(210, 40, 35, 20);
+    lblVecesRele.setBounds(250, 40, 50, 20);
+
+    lblCapsLeidos.setBounds(10, 40, 70, 20);
+    spCapL.setBounds(
+        lblCapsLeidos.getX() + lblCapsLeidos.getWidth() + 5, lblCapsLeidos.getY(), 50, 20);
+    lblCapTotales.setBounds(spCapL.getX() + spCapL.getWidth(), lblCapsLeidos.getY(), 50, 20);
+
+    lblPagsLeidas.setBounds(10, 70, 70, 20);
+    spPagL.setBounds(lblPagsLeidas.getX() + lblPagsLeidas.getWidth() + 5, 70, 50, 20);
+    lblPagTotales.setBounds(spPagL.getX() + spPagL.getWidth(), lblPagsLeidas.getY(), 50, 20);
+
+    lblNota.setBounds(10, 100, 50, 20);
+    lblNota.setHorizontalAlignment(SwingConstants.CENTER);
+
+    spNota.setBounds(85, 100, 50, 20);
+    btnUpdate.setBounds(190, 70, 145, 25);
+    btnCancelar.setBounds(190, 95, 145, 20);
+
+    spVecesRele.setEnabled(false);
 
     panelEntregas.setBounds(panelTecnico.getBounds());
+    scrollPaneSecuelas.setBounds(0, 0, panelEntregas.getWidth(), panelEntregas.getHeight() - 25);
+    listasecuelas.setBounds(0, 0, scrollPaneSecuelas.getWidth(), scrollPaneSecuelas.getHeight());
 
-    scrollPane.setBounds(0, 0, panelEntregas.getWidth(), panelEntregas.getHeight() - 25);
-    listasecuelas.setBounds(0, 0, scrollPane.getWidth(), scrollPane.getHeight());
-
-    scrollPane.setBackground(panel.getBackground());
+    scrollPaneSecuelas.setBackground(panel.getBackground());
     listasecuelas.setBackground(panel.getBackground());
 
     getContentPane().add(panel);
 
+    if (libro != null) {
+      colecc = libro.getString("Saga");
+      isbn = libro.getString("ISBN");
+      urlPortada = libro.getString("PortadaURL");
+      mostrarInfoLibro(libro);
+    }
+
     // Empaquetado, tamaño y visualizazion
     pack();
-    setSize(1350, 650);
+    setSize(1350, 630);
     setVisible(true);
   }
 
   public void mostrarInfoLibro(Document libro) {
+    urlPortada = libro.getString("PortadaURL");
     añadirPortada();
     lblISBN.setText("ISBN: " + libro.getString("ISBN"));
     lblTitlo.setText(libro.getString("Titulo"));
@@ -264,15 +320,18 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
     }
     txtASinopsis.setText(libro.getString("Sinopsis"));
     lblColeccion.setText("Saga: " + libro.getString("Saga") + "  " + libro.getInteger("Tomo"));
-    lblCapitulos.setText("Capitulos: " + libro.getInteger("Capitulos"));
+    if (libro.getInteger("Capitulos") != null)
+      lblCapitulos.setText("Capitulos: " + libro.getInteger("Capitulos"));
+    if (libro.getInteger("Paginas") != null)
+      lblPaginas.setText("Paginas: " + libro.getInteger("Paginas"));
     if (libro.getDate("f_publicacion") != null) {
       SimpleDateFormat sdf = new SimpleDateFormat("dd - MMMM - yyyy");
       lblPublicacion.setText("Fecha de Publicación: " + sdf.format(libro.getDate("f_publicacion")));
     }
     if (libro.getInteger("Capitulos") != null) {
-      valMaximio = libro.getInteger("Capitulos");
-      spCapL.setModel(new SpinnerNumberModel(0, 0, valMaximio, 1));
-      lblCapTotales.setText("/" + valMaximio);
+      valMaximoCaps = libro.getInteger("Capitulos");
+      spCapL.setModel(new SpinnerNumberModel(0, 0, valMaximoCaps, 1));
+      lblCapTotales.setText("/" + valMaximoCaps);
     } else {
       spCapL.setModel(new SpinnerNumberModel(0, 0, 999, 1));
       lblCapTotales.setText("/???");
@@ -294,9 +353,23 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
     isbn = libro.getString("ISBN");
   }
 
+  public void repeticion() {
+    jchReleido.addActionListener(
+        new ActionListener() {
+          @Override
+          public void actionPerformed(ActionEvent e) {
+            if (jchReleido.isSelected() == true) {
+              spVecesRele.setEnabled(true);
+            } else {
+              spVecesRele.setEnabled(false);
+            }
+          }
+        });
+  }
+
   public void añadirPortada() {
     try {
-   URL url = new URL(urlPortada);
+      URL url = new URL(urlPortada);
       Image portada = ImageIO.read(url);
       ImageIcon portadaIco = new ImageIcon(portada);
       Icon icono =
@@ -304,15 +377,14 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
               portadaIco
                   .getImage()
                   .getScaledInstance(
-                      lblPortada.getWidth(),
-                      lblPortada.getHeight(),
-                      Image.SCALE_DEFAULT));
-     lblPortada.setIcon(icono);
-    lblPortada.setBorder(null);
-    repaint();
+                      lblPortada.getWidth(), lblPortada.getHeight(), Image.SCALE_DEFAULT));
+      lblPortada.setIcon(icono);
+      lblPortada.setBorder(null);
+      repaint();
 
     } catch (Exception ex) {
-      JOptionPane.showMessageDialog(null, "Lo Sentimos, no es posible mostrar la portada de este ejemplar" + urlPortada);
+      JOptionPane.showMessageDialog(
+          null, "Lo Sentimos, no es posible mostrar la portada de este ejemplar" + urlPortada);
     }
   }
 
@@ -416,8 +488,17 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
 
   public String loreIpsum() {
     return " Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris lacinia porttitor libero in commodo. Integer erat metus, condimentum ut mattis quis, pretium sit amet orci. Aenean faucibus eu lacus eget iaculis. Aenean placerat ultrices suscipit. Etiam venenatis nulla ut pharetra scelerisque. Suspendisse scelerisque efficitur elit, id consequat ex tempus at. Nam odio erat, gravida at ante in, pellentesque porttitor ante. Maecenas semper a turpis et euismod.\n"
-        + "\n"
-        + "Integer sed ultricies sapien. Etiam scelerisque justo at dapibus gravida. Vestibulum sit amet nisi elit. Nam scelerisque magna nibh, feugiat dictum magna blandit at. Praesent dictum mi nec fermentum consequat. Maecenas molestie urna et lorem auctor mollis vitae mollis eros. Phasellus interdum tortor sed venenatis porta. Mauris hendrerit quis neque id aliquet. In a scelerisque urna, in fringilla tortor. Fusce in sodales enim, id iaculis leo. Nulla in laoreet urna, et sodales sem. ";
+        + "Integer sed ultricies sapien. Etiam scelerisque justo at dapibus gravida. Vestibulum sit amet nisi elit. Nam scelerisque magna nibh, feugiat dictum magna blandit at. Praesent dictum mi nec fermentum consequat. Maecenas molestie urna et lorem auctor mollis vitae mollis eros. Phasellus interdum tortor sed venenatis porta. Mauris hendrerit quis neque id aliquet. In a scelerisque urna, in fringilla tortor. Fusce in sodales enim, id iaculis leo. Nulla in laoreet urna, et sodales sem. + \"\\n\"\n"
+        + " \"Integer sed ultricies sapien. Etiam scelerisque justo at dapibus gravida. Vestibulum sit amet nisi elit. Nam scelerisque magna nibh, feugiat dictum magna blandit at. Praesent dictum mi nec fermentum consequat. Maecenas molestie urna et lorem auctor mollis vitae mollis eros. Phasellus interdum tortor sed venenatis porta. Mauris hendrerit quis neque id aliquet. In a scelerisque urna, in fringilla tortor. Fusce in sodales enim, id iaculis leo. Nulla in laoreet urna, et sodales sem. + \"\\n\"\n"
+        + " \"Integer sed ultricies sapien. Etiam scelerisque justo at dapibus gravida. Vestibulum sit amet nisi elit. Nam scelerisque magna nibh, feugiat dictum magna blandit at. Praesent dictum mi nec fermentum consequat. Maecenas molestie urna et lorem auctor mollis vitae mollis eros. Phasellus interdum tortor sed venenatis porta. Mauris hendrerit quis neque id aliquet. In a scelerisque urna, in fringilla tortor. Fusce in sodales enim, id iaculis leo. Nulla in laoreet urna, et sodales sem. + \"\\n\"\n"
+        + " \"Integer sed ultricies sapien. Etiam scelerisque justo at dapibus gravida. Vestibulum sit amet nisi elit. Nam scelerisque magna nibh, feugiat dictum magna blandit at. Praesent dictum mi nec fermentum consequat. Maecenas molestie urna et lorem auctor mollis vitae mollis eros. Phasellus interdum tortor sed venenatis porta. Mauris hendrerit quis neque id aliquet. In a scelerisque urna, in fringilla tortor. Fusce in sodales enim, id iaculis leo. Nulla in laoreet urna, et sodales sem. + \"\\n\"\n"
+        + " \"Integer sed ultricies sapien. Etiam scelerisque justo at dapibus gravida. Vestibulum sit amet nisi elit. Nam scelerisque magna nibh, feugiat dictum magna blandit at. Praesent dictum mi nec fermentum consequat. Maecenas molestie urna et lorem auctor mollis vitae mollis eros. Phasellus interdum tortor sed venenatis porta. Mauris hendrerit quis neque id aliquet. In a scelerisque urna, in fringilla tortor. Fusce in sodales enim, id iaculis leo. Nulla in laoreet urna, et sodales sem. + \"\\n\"\n"
+        + " \"Integer sed ultricies sapien. Etiam scelerisque justo at dapibus gravida. Vestibulum sit amet nisi elit. Nam scelerisque magna nibh, feugiat dictum magna blandit at. Praesent dictum mi nec fermentum consequat. Maecenas molestie urna et lorem auctor mollis vitae mollis eros. Phasellus interdum tortor sed venenatis porta. Mauris hendrerit quis neque id aliquet. In a scelerisque urna, in fringilla tortor. Fusce in sodales enim, id iaculis leo. Nulla in laoreet urna, et sodales sem. + \"\\n\"\n"
+        + " \"Integer sed ultricies sapien. Etiam scelerisque justo at dapibus gravida. Vestibulum sit amet nisi elit. Nam scelerisque magna nibh, feugiat dictum magna blandit at. Praesent dictum mi nec fermentum consequat. Maecenas molestie urna et lorem auctor mollis vitae mollis eros. Phasellus interdum tortor sed venenatis porta. Mauris hendrerit quis neque id aliquet. In a scelerisque urna, in fringilla tortor. Fusce in sodales enim, id iaculis leo. Nulla in laoreet urna, et sodales sem. + \"\\n\"\n"
+        + " \"Integer sed ultricies sapien. Etiam scelerisque justo at dapibus gravida. Vestibulum sit amet nisi elit. Nam scelerisque magna nibh, feugiat dictum magna blandit at. Praesent dictum mi nec fermentum consequat. Maecenas molestie urna et lorem auctor mollis vitae mollis eros. Phasellus interdum tortor sed venenatis porta. Mauris hendrerit quis neque id aliquet. In a scelerisque urna, in fringilla tortor. Fusce in sodales enim, id iaculis leo. Nulla in laoreet urna, et sodales sem. + \"\\n\"\n"
+        + " \"Integer sed ultricies sapien. Etiam scelerisque justo at dapibus gravida. Vestibulum sit amet nisi elit. Nam scelerisque magna nibh, feugiat dictum magna blandit at. Praesent dictum mi nec fermentum consequat. Maecenas molestie urna et lorem auctor mollis vitae mollis eros. Phasellus interdum tortor sed venenatis porta. Mauris hendrerit quis neque id aliquet. In a scelerisque urna, in fringilla tortor. Fusce in sodales enim, id iaculis leo. Nulla in laoreet urna, et sodales sem. + \"\\n\"\n"
+        + " \"Integer sed ultricies sapien. Etiam scelerisque justo at dapibus gravida. Vestibulum sit amet nisi elit. Nam scelerisque magna nibh, feugiat dictum magna blandit at. Praesent dictum mi nec fermentum consequat. Maecenas molestie urna et lorem auctor mollis vitae mollis eros. Phasellus interdum tortor sed venenatis porta. Mauris hendrerit quis neque id aliquet. In a scelerisque urna, in fringilla tortor. Fusce in sodales enim, id iaculis leo. Nulla in laoreet urna, et sodales sem. + \"\\n\"\n"
+        + " \"Integer sed ultricies sapien. Etiam scelerisque justo at dapibus gravida. Vestibulum sit amet nisi elit. Nam scelerisque magna nibh, feugiat dictum magna blandit at. Praesent dictum mi nec fermentum consequat. Maecenas molestie urna et lorem auctor mollis vitae mollis eros. Phasellus interdum tortor sed venenatis porta. Mauris hendrerit quis neque id aliquet. In a scelerisque urna, in fringilla tortor. Fusce in sodales enim, id iaculis leo. Nulla in laoreet urna, et sodales sem. ";
   }
 
   public void cambioTema(String color) {
@@ -439,6 +520,6 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
     for (JComponent jComponent : jCompPestadoA) {
       panelEstado.add(jComponent);
     }
-    panelEntregas.add(scrollPane);
+    panelEntregas.add(scrollPaneSecuelas);
   }
 }

@@ -14,9 +14,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.net.URL;
 
-import static com.mongodb.client.model.Filters.*;
-import static com.mongodb.client.model.Projections.*;
-import static com.mongodb.client.model.Sorts.*;
+import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Projections.include;
+import static com.mongodb.client.model.Sorts.descending;
 
 public class IntfzPrincipal extends JFrame implements Interfaz {
 
@@ -30,7 +30,6 @@ public class IntfzPrincipal extends JFrame implements Interfaz {
   MongoClient mongoClient = new MongoClient(uri);
   MongoDatabase DDBB = mongoClient.getDatabase("LoHeLeidoDB");
   MongoCollection<Document> collecLibro = DDBB.getCollection("Libro");
-
 
   static final int NUMERO_LABELS = 12;
 
@@ -74,7 +73,11 @@ public class IntfzPrincipal extends JFrame implements Interfaz {
     }
 
     lblsPortadas[0].setBounds(37, 100, 210, 332);
-    lblsTitulos[0].setBounds(lblsPortadas[0].getX(), lblsPortadas[0].getY() + lblsPortadas[0].getHeight() + 15, lblsPortadas[0].getWidth(), 25);
+    lblsTitulos[0].setBounds(
+        lblsPortadas[0].getX(),
+        lblsPortadas[0].getY() + lblsPortadas[0].getHeight() + 15,
+        lblsPortadas[0].getWidth(),
+        25);
     int portadasPorFila = 6;
     for (int i = 1; i < NUMERO_LABELS; i++) {
       if (i % portadasPorFila == 0) {
@@ -105,7 +108,6 @@ public class IntfzPrincipal extends JFrame implements Interfaz {
     pack();
     setSize(1600, 1000);
     setVisible(true);
-
   }
 
   public void ultimosAgregados() {
@@ -124,6 +126,7 @@ public class IntfzPrincipal extends JFrame implements Interfaz {
       Document titulos = ultimoAgregados.next();
       ultimosTitulos[pos] = new String(titulos.get("Titulo").toString());
       lblsTitulos[pos].setText(ultimosTitulos[pos]);
+      lblsTitulos[pos].setBorder(null);
       urlPortada = titulos.getString("PortadaURL");
       try {
         URL url = new URL(urlPortada);
@@ -139,6 +142,8 @@ public class IntfzPrincipal extends JFrame implements Interfaz {
                         Image.SCALE_SMOOTH));
         lblsPortadas[pos].setIcon(icono);
         lblsPortadas[pos].setText("");
+        lblsPortadas[pos].setBorder(null);
+
         repaint();
       } catch (Exception ex) {
         lblsPortadas[pos].setText(titulos.get("Titulo").toString());
@@ -159,6 +164,7 @@ public class IntfzPrincipal extends JFrame implements Interfaz {
           }
         });
   }
+
   private void irLibroT(JLabel jLabel) {
     jLabel.addMouseListener(
         new MouseAdapter() {
@@ -189,5 +195,4 @@ public class IntfzPrincipal extends JFrame implements Interfaz {
   public void cambioTema(String color) {
     Temas.cambioTema(color, jPanelA, null, null, null, null, null, null);
   }
-
 }

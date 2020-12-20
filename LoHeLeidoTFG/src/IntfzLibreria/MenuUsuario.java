@@ -40,7 +40,8 @@ public class MenuUsuario extends JFrame {
 
   JLabel lblTituloProyecto;
   JLabel lblUsuario = new JLabel();
-  JLabel lblRegLibro = new JLabel("No encunetra el libro que busca en nuestra Libreria, pulse aqui para añadirlo.");
+  JLabel lblRegLibro =
+      new JLabel("No encunetra el libro que busca en nuestra Libreria, pulse aqui para añadirlo.");
   JTextField txtPBuscador;
   JTextField txtBuscador;
 
@@ -67,24 +68,22 @@ public class MenuUsuario extends JFrame {
   JLabel[] jLabelA = {lblTituloProyecto, lblUsuario};
   JButton[] jButtonA = {btnLogIn, btnCuenta, btnBiblioteca, btnLogOut, btnClose};
 
-
   JLabel jPrueba;
-
 
   public MenuUsuario(JPanel jpanel, Interfaz interfazActiva) {
     this.interfazActiva = interfazActiva;
 
     String[] colores = {
-        "Claro",
-        "Oscuro",
-        "Amarillo Oscuro",
-        "Rojo Oscuro",
-        "Verde Oscuro",
-        "Azul Oscuro",
-        "Naranja Claro",
-        "Rojo Claro",
-        "Verde Claro",
-        "Azul Claro",
+      "Claro",
+      "Oscuro",
+      "Amarillo Oscuro",
+      "Rojo Oscuro",
+      "Verde Oscuro",
+      "Azul Oscuro",
+      "Naranja Claro",
+      "Rojo Claro",
+      "Verde Claro",
+      "Azul Claro",
     };
 
     lblTituloProyecto = new JLabel("¿Lo he leído?");
@@ -116,9 +115,7 @@ public class MenuUsuario extends JFrame {
             portadaIco
                 .getImage()
                 .getScaledInstance(
-                    btnEscape.getWidth() + 5,
-                    btnEscape.getHeight() + 10,
-                    Image.SCALE_DEFAULT));
+                    btnEscape.getWidth() + 5, btnEscape.getHeight() + 10, Image.SCALE_DEFAULT));
     btnEscape.setIcon(icono);
 
     jPrueba = new JLabel("Prueba");
@@ -131,7 +128,8 @@ public class MenuUsuario extends JFrame {
     lblRegLibro.setForeground(Color.blue);
     panelBusqueda.add(lblRegLibro);
     if (IntfzLogin.id_Usuario.equals("Invitado")) {
-      lblRegLibro.setText("Si no encuentras el libro que buscas, unete a 'Lo He Leído', para registrarlo");
+      lblRegLibro.setText(
+          "Si no encuentras el libro que buscas, unete a 'Lo He Leído', para registrarlo");
     } else {
       abrirRegLibro();
     }
@@ -167,7 +165,7 @@ public class MenuUsuario extends JFrame {
           }
         });
 
-    //crearComponentes(jpanel);
+    // crearComponentes(jpanel);
     btnLog();
     despliegePaneles();
     botonesUsuario();
@@ -272,7 +270,6 @@ public class MenuUsuario extends JFrame {
             System.exit(0);
           }
         });
-
   }
 
   public void abrirRegLibro() {
@@ -281,6 +278,7 @@ public class MenuUsuario extends JFrame {
           @Override
           public void mouseClicked(MouseEvent e) {
             panelBusqueda.setVisible(false);
+            txtBuscador.setVisible(true);
             dispose();
             intfzRegLibro.iniciar();
           }
@@ -307,42 +305,45 @@ public class MenuUsuario extends JFrame {
     campo.addDocumentListener(busqueda);
   }
 
-//TODO Por terminar
+  // TODO Por terminar
 
   private class EscuchaTexto implements DocumentListener {
     @Override
     public void insertUpdate(DocumentEvent e) {
       jPrueba.setText(txtPBuscador.getText());
-
     }
 
     @Override
     public void removeUpdate(DocumentEvent e) {
-     jPrueba.setText(txtPBuscador.getText());
-
+      jPrueba.setText(txtPBuscador.getText());
     }
 
     @Override
     public void changedUpdate(DocumentEvent e) {
-// Este no es necesario para el funcionamiento de la app
+      // Este no es necesario para el funcionamiento de la app
     }
   }
 
   public void disposeAll() {
 
-    if (intfzPrincipal.isShowing()) ;
+    if (intfzPrincipal.isShowing())
+      ;
     intfzPrincipal.dispose();
-    if (intfzLogin.isShowing()) ;
+    if (intfzLogin.isShowing())
+      ;
     intfzLogin.dispose();
-    if (intfzMiBiblioteca.isShowing()) ;
+    if (intfzMiBiblioteca.isShowing())
+      ;
     intfzMiBiblioteca.dispose();
-    if (intfzMiCuenta.isShowing()) ;
+    if (intfzMiCuenta.isShowing())
+      ;
     intfzMiCuenta.dispose();
-    if (intfzRegistro.isShowing()) ;
+    if (intfzRegistro.isShowing())
+      ;
     intfzRegistro.dispose();
-    if (intfzRegLibro.isShowing()) ;
+    if (intfzRegLibro.isShowing())
+      ;
     intfzRegLibro.dispose();
-
   }
 
   public void crearComponentes(JPanel jpanel) {
@@ -356,12 +357,9 @@ public class MenuUsuario extends JFrame {
     for (JButton jButton : jButtonA) {
       panelMenuUsuario.add(jButton);
     }
-  }// No Funciona
+  } // No Funciona
 
   public void cambioTema(String color) {
     Temas.cambioTema(color, jPanelA, jLabelA, null, null, null, null, null);
   } // Esto no funciona
-
 }
-
-

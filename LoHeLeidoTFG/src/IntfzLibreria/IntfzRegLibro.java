@@ -81,30 +81,30 @@ public class IntfzRegLibro extends JFrame {
   JCheckBox[] jCheckBoxA = {ch1, ch2, ch3, ch4, ch5, ch6, ch7, ch8, ch9, ch10, ch11, ch12};
 
   JComponent[] jComponentA = {
-      panelGenero,
-      lblPortada,
-      lblISBN,
-      lblTitulo,
-      lblAutor,
-      lblColeccion,
-      lblResumen,
-      lblPublicacion,
-      lblISBN,
-      lblCapitulos,
-      lblPaginas,
-      lblNColeccion,
-      lblPortadaURL,
-      txtTitulo,
-      txtAutor,
-      txtISBN,
-      txtColeccion,
-      spCapitulos,
-      spPaginas,
-      spNColeccion,
-      scrollPane,
-      txtURL,
-      btnAddLibro,
-      datePublicacion
+    panelGenero,
+    lblPortada,
+    lblISBN,
+    lblTitulo,
+    lblAutor,
+    lblColeccion,
+    lblResumen,
+    lblPublicacion,
+    lblISBN,
+    lblCapitulos,
+    lblPaginas,
+    lblNColeccion,
+    lblPortadaURL,
+    txtTitulo,
+    txtAutor,
+    txtISBN,
+    txtColeccion,
+    spCapitulos,
+    spPaginas,
+    spNColeccion,
+    scrollPane,
+    txtURL,
+    btnAddLibro,
+    datePublicacion
   };
 
   public IntfzRegLibro() {
@@ -184,21 +184,21 @@ public class IntfzRegLibro extends JFrame {
   }
 
   public void registrarLibro() {
-    btnAddLibro.addActionListener(new ActionListener() {
-      @Override
-      public void actionPerformed(ActionEvent e) {
-        sinEspacios();
-        if (obligatorios() == true) {
-          if (existeLibro() == false) {
-            añadirLibro();
-            mensajeEmergente(1);
-          } else {
-            mensajeEmergente(2);
+    btnAddLibro.addActionListener(
+        new ActionListener() {
+          @Override
+          public void actionPerformed(ActionEvent e) {
+            sinEspacios();
+            if (obligatorios() == true) {
+              if (existeLibro() == false) {
+                añadirLibro();
+                mensajeEmergente(1);
+              } else {
+                mensajeEmergente(2);
+              }
+            }
           }
-        }
-      }
-    });
-
+        });
   }
 
   public void añadirLibro() {
@@ -268,8 +268,8 @@ public class IntfzRegLibro extends JFrame {
       if (spNColeccion.getValue().equals(0)) spNColeccion.setValue(spNColeccion.getNextValue());
     }
     if (spPaginas.getValue().equals(0) & spCapitulos.getValue().equals(0)) i++;
-    if(lblPortada.getIcon() == null) i++;
-    //TODO Mensajes de respuesta en caso de que se haya olvidado de un campo obligatorio
+    if (lblPortada.getIcon() == null) i++;
+    // TODO Mensajes de respuesta en caso de que se haya olvidado de un campo obligatorio
     if (i > 0) {
       mensajeEmergente(10);
       return false;
@@ -308,14 +308,13 @@ public class IntfzRegLibro extends JFrame {
 
     @Override
     public void removeUpdate(DocumentEvent e) {
-      //añadirPortada();
+      // añadirPortada();
       lblPortada.setIcon(null);
-
     }
 
     @Override
     public void changedUpdate(DocumentEvent e) {
-// Este no es necesario para el funcionamiento de la app
+      // Este no es necesario para el funcionamiento de la app
     }
   }
 
@@ -329,14 +328,13 @@ public class IntfzRegLibro extends JFrame {
               portadaIco
                   .getImage()
                   .getScaledInstance(
-                      lblPortada.getWidth(),
-                      lblPortada.getHeight(),
-                      Image.SCALE_DEFAULT));
+                      lblPortada.getWidth(), lblPortada.getHeight(), Image.SCALE_DEFAULT));
       lblPortada.setIcon(icono);
       lblPortada.setBorder(null);
       repaint();
     } catch (Exception ex) {
-      JOptionPane.showMessageDialog(null, "Error: No se ha podido abrir la imagen de la URL => " + txtURL.getText());
+      JOptionPane.showMessageDialog(
+          null, "Error: No se ha podido abrir la imagen de la URL => " + txtURL.getText());
     }
   }
 
@@ -350,9 +348,15 @@ public class IntfzRegLibro extends JFrame {
           JOptionPane.INFORMATION_MESSAGE);
     } else if (mensaje == 10) {
       JOptionPane.showMessageDialog(
-          null, "El ISBN, el Titulo, el Autor y las Paginas o los Capitulos son campos obligatorios", "Registro Fallido", JOptionPane.ERROR_MESSAGE);
+          null,
+          "El ISBN, el Titulo, el Autor y las Paginas o los Capitulos son campos obligatorios",
+          "Registro Fallido",
+          JOptionPane.ERROR_MESSAGE);
     } else
       JOptionPane.showMessageDialog(
-          null, "Ya existe un libro con este ISBN, esta es la informacion del libro relacionado a este ISBN ", "Registro Fallido", JOptionPane.ERROR_MESSAGE);
+          null,
+          "Ya existe un libro con este ISBN, esta es la informacion del libro relacionado a este ISBN ",
+          "Registro Fallido",
+          JOptionPane.ERROR_MESSAGE);
   }
 }

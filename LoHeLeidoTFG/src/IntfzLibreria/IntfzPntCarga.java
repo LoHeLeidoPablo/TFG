@@ -103,7 +103,7 @@ public class IntfzPntCarga extends JFrame {
               try {
                 MongoClientURI uri =
                     new MongoClientURI(
-                         "mongodb+srv://AdminUser:iReadIt@loheleido.idhnu.mongodb.net/LoHeLeidoDB?retryWrites=true&w=majority");
+                        "mongodb+srv://AdminUser:iReadIt@loheleido.idhnu.mongodb.net/LoHeLeidoDB?retryWrites=true&w=majority");
 
                 MongoClient mongoClient = new MongoClient(uri);
                 MongoDatabase DDBB = mongoClient.getDatabase("LoHeLeidoDB");

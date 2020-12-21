@@ -38,8 +38,6 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
   MongoCollection<Document> collecDetLibro = DDBB.getCollection("DetallesPrestamo");
   MongoCollection<Document> collecUsuario = DDBB.getCollection("Usuario");
 
-  MongoCursor<Document> coleccion;
-
   IntfzActualizarLibro intfzActualizarLibro = new IntfzActualizarLibro();
 
   JPanel panel = new JPanel();
@@ -337,7 +335,7 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
       lblCapTotales.setText("/???");
     }
     dlm.clear();
-    coleccion =
+    MongoCursor<Document> coleccion =
         collecLibro
             .find(eq("Saga", libro.getString("Saga")))
             .sort(ascending("Tomo"))

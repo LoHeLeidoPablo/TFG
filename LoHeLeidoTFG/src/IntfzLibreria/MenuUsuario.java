@@ -3,6 +3,7 @@ package IntfzLibreria;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 
@@ -12,10 +13,10 @@ import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.font.TextAttribute;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyVetoException;
-import java.beans.VetoableChangeListener;
 import java.util.Map;
+
+import static com.mongodb.client.model.Filters.*;
+import static com.mongodb.client.model.Sorts.*;
 
 public class MenuUsuario extends JFrame {
 
@@ -26,6 +27,7 @@ public class MenuUsuario extends JFrame {
   MongoClient mongoClient = new MongoClient(uri);
   MongoDatabase DDBB = mongoClient.getDatabase("LoHeLeidoDB");
   MongoCollection<Document> collecUsuario = DDBB.getCollection("Usuario");
+  MongoCollection<Document> collecLibro = DDBB.getCollection("Libro");
 
   IntfzInfoLibro infoLibro = new IntfzInfoLibro();
   IntfzLogin intfzLogin = new IntfzLogin();
@@ -42,8 +44,11 @@ public class MenuUsuario extends JFrame {
   JLabel lblUsuario = new JLabel();
   JLabel lblRegLibro =
       new JLabel("No encunetra el libro que busca en nuestra Libreria, pulse aqui para añadirlo.");
-  JTextField txtPBuscador;
+  JTextField txtBuscadorP;
   JTextField txtBuscador;
+  JList<String> lstCoincidencias = new JList<String>();
+  DefaultListModel dlm = new DefaultListModel();
+  JScrollPane scrollPaneResultados = new JScrollPane(lstCoincidencias);
 
   JComboBox<String> jcbTemas;
   JComboBox<String> jcbElementos;
@@ -63,12 +68,14 @@ public class MenuUsuario extends JFrame {
   Font fuenteUsu = new Font("Book Antiqua", 1, 22);
   Font font = lblRegLibro.getFont();
 
+  String elemento = "Titulo";
+
+  MongoCursor<Document> coleccion;
+
   Interfaz interfazActiva;
   JPanel[] jPanelA = {panelMenuUsuario, panelBusqueda};
   JLabel[] jLabelA = {lblTituloProyecto, lblUsuario};
   JButton[] jButtonA = {btnLogIn, btnCuenta, btnBiblioteca, btnLogOut, btnClose};
-
-  JLabel jPrueba;
 
   public MenuUsuario(JPanel jpanel, Interfaz interfazActiva) {
     this.interfazActiva = interfazActiva;
@@ -92,20 +99,36 @@ public class MenuUsuario extends JFrame {
     jpanel.add(lblTituloProyecto);
 
     txtBuscador = new JTextField("Buscar por ISBN, Titulo, Autor, Serie, Saga, Autor...");
-    txtBuscador.setBounds(315, 30, 1000, 30);
+    txtBuscador.setBounds(375, 30, 850, 30);
+    txtBuscador.setFocusable(false);
     jpanel.add(txtBuscador);
 
     panelBusqueda = new JPanel();
-    panelBusqueda.setBounds(315, 15, 1000, 500);
+    panelBusqueda.setBounds(txtBuscador.getX(), 15, txtBuscador.getWidth(), 500);
     panelBusqueda.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
     panelBusqueda.setLayout(null);
     panelBusqueda.hide();
     jpanel.add(panelBusqueda);
 
-    txtPBuscador = new JTextField();
-    txtPBuscador.setBounds(50, 50, 900, 25);
-    panelBusqueda.add(txtPBuscador);
-
+    txtBuscadorP = new JTextField();
+    txtBuscadorP.setBounds(100, 15, 500, 25);
+    panelBusqueda.add(txtBuscadorP);
+    String[] elementos = {"ISBN", "Titulo", "Autor", "Saga"};
+    jcbElementos = new JComboBox<>(elementos);
+    jcbElementos.setBounds(
+        txtBuscadorP.getX() + txtBuscadorP.getWidth(),
+        txtBuscadorP.getY(),
+        75,
+        txtBuscadorP.getHeight());
+    jcbElementos.addActionListener(
+        new ActionListener() {
+          @Override
+          public void actionPerformed(ActionEvent e) {
+            elemento = jcbElementos.getSelectedItem().toString();
+            queryLike();
+          }
+        });
+    panelBusqueda.add(jcbElementos);
     btnEscape = new JButton();
     btnEscape.setBounds(5, 5, 25, 25);
     panelBusqueda.add(btnEscape);
@@ -118,11 +141,13 @@ public class MenuUsuario extends JFrame {
                     btnEscape.getWidth() + 5, btnEscape.getHeight() + 10, Image.SCALE_DEFAULT));
     btnEscape.setIcon(icono);
 
-    jPrueba = new JLabel("Prueba");
-    jPrueba.setBounds(200, 200, 100, 100);
-    panelBusqueda.add(jPrueba);
-    jPrueba.setBorder(txtBuscador.getBorder());
-    jPrueba.setVisible(true);
+    scrollPaneResultados.setBounds(
+        50, 75, panelBusqueda.getWidth() - 100, panelBusqueda.getHeight() - 100);
+    lstCoincidencias.setBounds(
+        0, 0, scrollPaneResultados.getWidth(), scrollPaneResultados.getHeight());
+    scrollPaneResultados.setBackground(panelBusqueda.getBackground());
+    lstCoincidencias.setBackground(panelBusqueda.getBackground());
+    panelBusqueda.add(scrollPaneResultados);
 
     lblRegLibro.setBounds(200, 475, 600, 20);
     lblRegLibro.setForeground(Color.blue);
@@ -130,6 +155,7 @@ public class MenuUsuario extends JFrame {
     if (IntfzLogin.id_Usuario.equals("Invitado")) {
       lblRegLibro.setText(
           "Si no encuentras el libro que buscas, unete a 'Lo He Leído', para registrarlo");
+      abrirRegUsuario();
     } else {
       abrirRegLibro();
     }
@@ -170,6 +196,7 @@ public class MenuUsuario extends JFrame {
     despliegePaneles();
     botonesUsuario();
     busqueda();
+    mostrarLibro();
   }
 
   public void btnLog() {
@@ -201,6 +228,7 @@ public class MenuUsuario extends JFrame {
             panelBusqueda.show();
             panelBusqueda.setVisible(true);
             txtBuscador.setVisible(false);
+            jcbElementos.setSelectedIndex(1);
           }
         });
 
@@ -223,6 +251,7 @@ public class MenuUsuario extends JFrame {
           public void actionPerformed(ActionEvent e) {
             panelBusqueda.setVisible(false);
             txtBuscador.setVisible(true);
+            txtBuscadorP.setText("");
           }
         });
 
@@ -279,8 +308,33 @@ public class MenuUsuario extends JFrame {
           public void mouseClicked(MouseEvent e) {
             panelBusqueda.setVisible(false);
             txtBuscador.setVisible(true);
-            dispose();
             intfzRegLibro.iniciar();
+          }
+
+          @Override
+          public void mouseEntered(MouseEvent e) {
+            lblRegLibro.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+            Font subrayado = lblRegLibro.getFont();
+            Map attributes = subrayado.getAttributes();
+            attributes.put(TextAttribute.UNDERLINE, TextAttribute.UNDERLINE_ON);
+            lblRegLibro.setFont(subrayado.deriveFont(attributes));
+          }
+
+          @Override
+          public void mouseExited(MouseEvent e) {
+            lblRegLibro.setFont(font);
+          }
+        });
+  }
+
+  public void abrirRegUsuario() {
+    lblRegLibro.addMouseListener(
+        new MouseAdapter() {
+          @Override
+          public void mouseClicked(MouseEvent e) {
+            panelBusqueda.setVisible(false);
+            txtBuscador.setVisible(true);
+            intfzRegistro.iniciar();
           }
 
           @Override
@@ -301,27 +355,83 @@ public class MenuUsuario extends JFrame {
 
   public void busqueda() {
     EscuchaTexto busqueda = new EscuchaTexto();
-    javax.swing.text.Document campo = txtPBuscador.getDocument();
+    javax.swing.text.Document campo = txtBuscadorP.getDocument();
     campo.addDocumentListener(busqueda);
   }
-
-  // TODO Por terminar
 
   private class EscuchaTexto implements DocumentListener {
     @Override
     public void insertUpdate(DocumentEvent e) {
-      jPrueba.setText(txtPBuscador.getText());
+      queryLike();
     }
 
     @Override
     public void removeUpdate(DocumentEvent e) {
-      jPrueba.setText(txtPBuscador.getText());
+      queryLike();
     }
 
     @Override
     public void changedUpdate(DocumentEvent e) {
       // Este no es necesario para el funcionamiento de la app
     }
+  }
+
+  public void queryLike() {
+    dlm.clear();
+    coleccion = collecLibro.find().sort(ascending(elemento)).iterator();
+    while (coleccion.hasNext()) {
+      Document libroColec = coleccion.next();
+      String dato;
+      if (libroColec
+          .getString(elemento)
+          .toLowerCase()
+          .contains(txtBuscadorP.getText().toLowerCase())) {
+        if (elemento.equals("ISBN")) {
+          dato = libroColec.getString(elemento) + " - " + libroColec.getString("Titulo");
+          dlm.addElement(dato);
+        } else if (elemento.equals("Saga") || elemento.equals("Autor")) {
+          dato = libroColec.getString(elemento);
+          if (dlm.contains(dato)) {
+          } else {
+            dlm.addElement(dato);
+          }
+
+        } else {
+          dato = libroColec.getString(elemento);
+          dlm.addElement(dato);
+        }
+      }
+    }
+    lstCoincidencias.setModel(dlm);
+  }
+
+  public void mostrarLibro() {
+    lstCoincidencias.addMouseListener(
+        new MouseAdapter() {
+          public void mouseClicked(MouseEvent evt) {
+            lstCoincidencias = (JList) evt.getSource();
+            if (evt.getClickCount() == 2) {
+              String enlace = lstCoincidencias.getSelectedValue().toString();
+              Document libro = collecLibro.find(eq(elemento, enlace)).first();
+
+              if (elemento.equals("ISBN")) {
+                String isbn = enlace.substring(0, enlace.indexOf(" "));
+                Document libroISBN = collecLibro.find(eq(elemento, isbn)).first();
+                infoLibro.iniciar(libroISBN);
+              }
+              if (elemento.equals("Titulo")) {
+                infoLibro.iniciar(libro);
+              }
+              if (elemento.equals("Autor")) {
+                //TODO VOY A TENER UNA VENTANA DE INFO AUTOR
+              }
+              if (elemento.equals("Saga")) {
+                infoLibro.iniciar(libro);
+                infoLibro.tabbed.setSelectedIndex(getComponentCount());
+              }
+            }
+          }
+        });
   }
 
   public void disposeAll() {

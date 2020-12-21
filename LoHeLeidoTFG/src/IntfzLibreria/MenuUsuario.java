@@ -423,7 +423,7 @@ public class MenuUsuario extends JFrame {
                 infoLibro.iniciar(libro);
               }
               if (elemento.equals("Autor")) {
-                //TODO VOY A TENER UNA VENTANA DE INFO AUTOR
+                // TODO VOY A TENER UNA VENTANA DE INFO AUTOR
               }
               if (elemento.equals("Saga")) {
                 infoLibro.iniciar(libro);

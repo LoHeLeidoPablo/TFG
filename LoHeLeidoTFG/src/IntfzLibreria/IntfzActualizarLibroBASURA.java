@@ -1,6 +1,7 @@
 package IntfzLibreria;
 
-import com.mongodb.*;
+import com.mongodb.MongoClient;
+import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.result.DeleteResult;
@@ -11,23 +12,17 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import static com.mongodb.client.model.Filters.eq;
-import static com.mongodb.client.model.Projections.include;
-import static com.mongodb.client.model.Sorts.ascending;
 
-public class IntfzActualizarLibro extends JFrame {
+public class IntfzActualizarLibroBASURA extends JFrame {
 
-/*  MongoClientURI uri =
+  MongoClientURI uri =
       new MongoClientURI(
           "mongodb+srv://AdminUser:iReadIt@loheleido.idhnu.mongodb.net/LoHeLeidoDB?retryWrites=true&w=majority");
   MongoClient mongoClient = new MongoClient(uri);
@@ -109,7 +104,7 @@ public class IntfzActualizarLibro extends JFrame {
       datePublicacion
   };
 
-  public IntfzActualizarLibro() {
+  public IntfzActualizarLibroBASURA() {
     this.setResizable(false);
   }
 
@@ -327,5 +322,5 @@ public class IntfzActualizarLibro extends JFrame {
       JOptionPane.showMessageDialog(
           null, "Este Libro ya esta registrado", "Registro Fallido", JOptionPane.ERROR_MESSAGE);
     }
-  }*/
+  }
 }

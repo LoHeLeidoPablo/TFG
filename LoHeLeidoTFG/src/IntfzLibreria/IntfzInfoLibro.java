@@ -36,7 +36,7 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
   MongoClient mongoClient = new MongoClient(uri);
   MongoDatabase DDBB = mongoClient.getDatabase("LoHeLeidoDB");
   MongoCollection<Document> collecLibro = DDBB.getCollection("Libro");
-  MongoCollection<Document> collecDetLibro = DDBB.getCollection("DetallesPrestamo");
+  MongoCollection<Document> collecDetPrestamo = DDBB.getCollection("DetallesPrestamo");
   MongoCollection<Document> collecDetBiblio = DDBB.getCollection("DetallesBiblioteca");
   MongoCollection<Document> collecUsuario = DDBB.getCollection("Usuario");
 
@@ -444,7 +444,7 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
                 prestamo.put("f_devolucion", f_devolucion);
                 prestamo.put("Prestado", true);
                 Document comproPrestamo = // ComprobarPrestamo
-                    collecDetLibro
+                    collecDetPrestamo
                         .find(
                             and(
                                 eq("Usuario", prestamo.get("Usuario")),
@@ -453,7 +453,7 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
                         /*.sort(descending("f_prestamo"))*/
                         .first();
                 if (comproPrestamo == null) {
-                  collecDetLibro.insertOne(prestamo);
+                  collecDetPrestamo.insertOne(prestamo);
                   collecUsuario.updateOne(
                       eq("Email", usuario.getString("Email")),
                       set("NPrestados", usuario.getInteger("NPrestados") + 1));

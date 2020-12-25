@@ -11,22 +11,26 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.font.TextAttribute;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import static com.mongodb.client.model.Filters.*;
+
 public class IntfzLogin extends JFrame {
   public static String id_Usuario = "Invitado";
+  public static Document UsuCuenta = new Document();
 
   IntfzPrincipal intfzPrincipal = new IntfzPrincipal();
 
   MongoClientURI uri =
       new MongoClientURI(
-          "mongodb+srv://PabloBibTFG:7Infantes@biblioteca.w5wrr.mongodb.net/LoHeLeidoDB?retryWrites=true&w=majority");
+          "mongodb+srv://AdminUser:iReadIt@loheleido.idhnu.mongodb.net/LoHeLeidoDB?retryWrites=true&w=majority");
 
   MongoClient mongoClient = new MongoClient(uri);
   MongoDatabase DDBB = mongoClient.getDatabase("LoHeLeidoDB");
   MongoCollection<Document> collecAuth = DDBB.getCollection("Auth");
-  MongoCollection<Document> collecUsuario = DDBB.getCollection("usuario");
+  MongoCollection<Document> collecUsuario = DDBB.getCollection("Usuario");
 
   JPanel panel = new JPanel();
 
@@ -40,8 +44,6 @@ public class IntfzLogin extends JFrame {
   JButton btnLogIn = new JButton("Iniciar Sesión");
   JCheckBox cbVerPasswd = new JCheckBox("Mostrar Contraseña");
 
-  boolean registrado = false;
-
   JComponent[] jComponentA = {
     lblTituloProyecto,
     lblUsuario,
@@ -52,22 +54,19 @@ public class IntfzLogin extends JFrame {
     lblRegistro,
     btnLogIn
   };
-  JPanel[] jPanelA = {panel};
-  JLabel[] jLabelA = {lblUsuario, lblTituloProyecto, lblPassword, lblRegistro};
-  JButton[] jButtonA = {btnLogIn};
-  JTextField[] jTextFieldA = {txtUsuario, txtPassword};
 
   Font font = lblRegistro.getFont();
 
   public IntfzLogin() {
     this.setResizable(false);
+    this.setLocation(100, 100);
   }
 
   public void iniciar() {
     setTitle("Iniciar Sesión - ¿Lo he leído?");
     getContentPane().setLayout(new GridLayout(1, 10));
-    existeUsuario();
     crearComponentes();
+    existeUsuario();
     panel.setLayout(null);
 
     lblTituloProyecto.setBounds(65, 10, 170, 25);
@@ -138,30 +137,32 @@ public class IntfzLogin extends JFrame {
         new ActionListener() {
           @Override
           public void actionPerformed(ActionEvent e) {
-            List<Document> consulta = collecAuth.find().into(new ArrayList<Document>());
-            List<Document> etqUsuario = collecUsuario.find().into(new ArrayList<Document>());
-            // TODO
-            /* Document doc =
-            collecAuth
-                .find(
-                    and(eq("Nombre", txtUsuario.getText()), eq("Nombre", txtUsuario.getText())))
-                .first();*/
-
-            for (int i = 0; i < consulta.size(); i++) {
-              Document usuario = consulta.get(i);
-              Document auth = consulta.get(i);
-              String usu = txtUsuario.getText();
-              String passwd = txtPassword.getText();
-              if (usu.equals(auth.getString("Nombre"))
-                  | usu.equals(auth.getString("Email"))
-                      & passwd.equals(auth.getString("Contraseña"))) {
-                registrado = true;
-                break;
+            Document usuAuth =
+                collecAuth
+                    .find(
+                        and(
+                            or(
+                                eq("Nombre", txtUsuario.getText()),
+                                eq("Email", txtUsuario.getText())),
+                            eq("Contraseña", txtPassword.getText())))
+                    .first();
+            if (usuAuth != null) {
+              UsuCuenta =
+                  collecUsuario
+                      .find(
+                          and(
+                              eq("Nombre", usuAuth.getString("Nombre")),
+                              eq("Email", usuAuth.getString("Email"))))
+                      .first();
+              if (UsuCuenta == null) {
+                UsuCuenta.put("Nombre", usuAuth.getString("Nombre"));
+                UsuCuenta.put("Email", usuAuth.getString("Email"));
+                UsuCuenta.put("fCreacionCuenta", new Date());
+                UsuCuenta.put("NPrestados", 0);
+                // UsuCuenta.put("Tema", "Claro");
+                collecUsuario.insertOne(UsuCuenta);
               }
-            }
-            if (registrado == true) {
-              id_Usuario = txtUsuario.getText(); // Poco Eficiente
-              panel.setVisible(false);
+              id_Usuario = UsuCuenta.getString("Nombre");
               dispose();
               intfzPrincipal.iniciar();
             } else {
@@ -173,9 +174,9 @@ public class IntfzLogin extends JFrame {
             }
           }
         });
-    // TODO Pasar objeto Auth a objeto Usuario
-    /*
-    menuUsuario = new Libreria.MenuUsuario(intfzPrincipal.panel,intfzPrincipal.jFramePrincipal,null);
+    // TODO Relanzar Principal para que aparezca el usuario que acaba de iniciar sesion
+
+    /*    menuUsuario = new Libreria.MenuUsuario(intfzPrincipal.panel,intfzPrincipal.jFramePrincipal,null);
        menuUsuario.repaint();
        intfzPrincipal.panel.repaint();
        intfzPrincipal.cerrarVentana();
@@ -187,9 +188,5 @@ public class IntfzLogin extends JFrame {
     for (JComponent jComponent : jComponentA) {
       panel.add(jComponent);
     }
-  }
-
-  public void cambioTema(String color) {
-    Temas.cambioTema(color, null, null, null, null, null, null, null);
   }
 }

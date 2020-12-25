@@ -7,105 +7,101 @@ import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.net.URL;
 
-import static com.mongodb.client.model.Filters.*;
-import static com.mongodb.client.model.Projections.*;
-import static com.mongodb.client.model.Sorts.*;
+import static com.mongodb.client.model.Filters.eq;
+import static com.mongodb.client.model.Projections.include;
+import static com.mongodb.client.model.Sorts.descending;
 
 public class IntfzPrincipal extends JFrame implements Interfaz {
 
   MenuUsuario menuUsuario;
-  PanelBusqueda panelBusqueda;
   IntfzInfoLibro intfzInfoLibro = new IntfzInfoLibro();
 
   MongoClientURI uri =
       new MongoClientURI(
-          "mongodb+srv://PabloBibTFG:7Infantes@biblioteca.w5wrr.mongodb.net/LoHeLeidoDB?retryWrites=true&w=majority");
+          "mongodb+srv://AdminUser:iReadIt@loheleido.idhnu.mongodb.net/LoHeLeidoDB?retryWrites=true&w=majority");
 
   MongoClient mongoClient = new MongoClient(uri);
   MongoDatabase DDBB = mongoClient.getDatabase("LoHeLeidoDB");
   MongoCollection<Document> collecLibro = DDBB.getCollection("Libro");
 
-  JLabel lblportada1 = new JLabel("Portada1: 164 * 256");
-  JLabel lblportada2 = new JLabel("Portada2: 164 * 256");
-  JLabel lblportada3 = new JLabel("Portada3: 164 * 256");
-  JLabel lblportada4 = new JLabel("Portada4: 164 * 256");
-  JLabel lblportada5 = new JLabel("Portada5: 164 * 256");
-  JLabel lblTitulo1 = new JLabel("Titulo Portada1");
-  JLabel lblTitulo2 = new JLabel("Titulo Portada2");
-  JLabel lblTitulo3 = new JLabel("Titulo Portada3");
-  JLabel lblTitulo4 = new JLabel("Titulo Portada4");
-  JLabel lblTitulo5 = new JLabel("Titulo Portada5");
+  static final int NUMERO_LABELS = 12;
+
+  JLabel[] lblsPortadas;
+  JLabel[] lblsTitulos;
+  String[] ultimosTitulos;
 
   Document libro;
 
   JPanel panel = new JPanel();
   JPanel[] jPanelA = {panel};
-  JLabel[] jLabelA = {
-    lblportada1,
-    lblportada2,
-    lblportada3,
-    lblportada4,
-    lblportada5,
-    lblTitulo1,
-    lblTitulo2,
-    lblTitulo3,
-    lblTitulo4,
-    lblTitulo5
-  };
 
   public IntfzPrincipal() {
     this.setResizable(false);
     setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    inicializarLabels();
+  }
+
+  private void inicializarLabels() {
+    lblsPortadas = new JLabel[NUMERO_LABELS];
+    lblsTitulos = new JLabel[NUMERO_LABELS];
+    for (int i = 0; i < NUMERO_LABELS; i++) {
+      lblsPortadas[i] = new JLabel("Portada" + i + ": 164 * 256");
+      lblsTitulos[i] = new JLabel("Titulo Portada" + i);
+    }
   }
 
   public void iniciar() {
     setTitle("¿Lo he leído?");
     getContentPane().setLayout(new GridLayout(1, 10));
     menuUsuario = new MenuUsuario(panel, this);
-    panelBusqueda = new PanelBusqueda(panel);
     crearComponentes();
     panel.setLayout(null);
-    for (JLabel jLabel : jLabelA) {
-      irLibro(jLabel);
+    int poslbl = -1;
+    for (JLabel jLabel : lblsPortadas) {
+      poslbl++;
+      irLibro(jLabel, poslbl);
     }
+    for (JLabel jLabel : lblsTitulos) {
+      irLibroT(jLabel);
+    }
+
+    lblsPortadas[0].setBounds(37, 100, 210, 332);
+    lblsTitulos[0].setBounds(
+        lblsPortadas[0].getX(),
+        lblsPortadas[0].getY() + lblsPortadas[0].getHeight() + 15,
+        lblsPortadas[0].getWidth(),
+        25);
+    int portadasPorFila = 6;
+    for (int i = 1; i < NUMERO_LABELS; i++) {
+      if (i % portadasPorFila == 0) {
+        lblsPortadas[i].setBounds(
+            lblsPortadas[0].getX(),
+            lblsTitulos[i - portadasPorFila].getY() + 75,
+            lblsPortadas[0].getWidth(),
+            lblsPortadas[0].getHeight());
+
+      } else {
+        lblsPortadas[i].setBounds(
+            lblsPortadas[i - 1].getX() + lblsPortadas[0].getWidth() + 50,
+            lblsPortadas[i - 1].getY(),
+            lblsPortadas[0].getWidth(),
+            lblsPortadas[0].getHeight());
+      }
+      lblsTitulos[i].setBounds(
+          lblsPortadas[i].getX(),
+          lblsPortadas[i].getY() + lblsPortadas[i].getHeight() + 15,
+          lblsPortadas[0].getWidth(),
+          lblsTitulos[0].getHeight());
+    }
+
     ultimosAgregados();
-
-    lblportada1.setBounds(75, 100, 250, 467);
-    lblportada2.setBounds(375, 100, lblportada1.getWidth(), lblportada1.getHeight());
-    lblportada3.setBounds(675, 100, lblportada1.getWidth(), lblportada1.getHeight());
-    lblportada4.setBounds(975, 100, lblportada1.getWidth(), lblportada1.getHeight());
-    lblportada5.setBounds(1275, 100, lblportada1.getWidth(), lblportada1.getHeight());
-    lblTitulo1.setBounds(
-        lblportada1.getX(),
-        lblportada1.getY() + lblportada1.getHeight() + 20,
-        lblportada1.getWidth(),
-        20);
-    lblTitulo2.setBounds(
-        lblportada2.getX(),
-        lblportada2.getY() + lblportada1.getHeight() + 20,
-        lblportada2.getWidth(),
-        20);
-    lblTitulo3.setBounds(
-        lblportada3.getX(),
-        lblportada3.getY() + lblportada1.getHeight() + 20,
-        lblportada3.getWidth(),
-        20);
-    lblTitulo4.setBounds(
-        lblportada4.getX(),
-        lblportada4.getY() + lblportada1.getHeight() + 20,
-        lblportada4.getWidth(),
-        20);
-    lblTitulo5.setBounds(
-        lblportada5.getX(),
-        lblportada5.getY() + lblportada1.getHeight() + 20,
-        lblportada5.getWidth(),
-        20);
-
     getContentPane().add(panel);
 
     // Empaquetado, tamaño y visualizazion
@@ -115,43 +111,88 @@ public class IntfzPrincipal extends JFrame implements Interfaz {
   }
 
   public void ultimosAgregados() {
+    ultimosTitulos = new String[NUMERO_LABELS];
     MongoCursor<Document> ultimoAgregados =
         collecLibro
             .find()
             .sort(descending("f_registro"))
-            .projection(include("Titulo"))
-            .limit(5)
+            .projection(include("Titulo", "PortadaURL"))
+            .limit(12)
             .iterator();
     int pos = -1;
+    String urlPortada = new String();
     while (ultimoAgregados.hasNext()) {
       pos++;
       Document titulos = ultimoAgregados.next();
-      jLabelA[pos].setText(titulos.get("Titulo").toString());
-      jLabelA[pos + 5].setText(titulos.get("Titulo").toString());
+      ultimosTitulos[pos] = new String(titulos.get("Titulo").toString());
+      lblsTitulos[pos].setText(ultimosTitulos[pos]);
+      lblsTitulos[pos].setBorder(null);
+      urlPortada = titulos.getString("PortadaURL");
+      try {
+        URL url = new URL(urlPortada);
+        Image portada = ImageIO.read(url);
+        ImageIcon portadaIco = new ImageIcon(portada);
+        Icon icono =
+            new ImageIcon(
+                portadaIco
+                    .getImage()
+                    .getScaledInstance(
+                        lblsPortadas[0].getWidth(),
+                        lblsPortadas[0].getHeight(),
+                        Image.SCALE_SMOOTH));
+        lblsPortadas[pos].setIcon(icono);
+        lblsPortadas[pos].setText("");
+        lblsPortadas[pos].setBorder(null);
+
+        repaint();
+      } catch (Exception ex) {
+        lblsPortadas[pos].setText(titulos.get("Titulo").toString());
+      }
     }
   }
 
-  public void irLibro(JLabel jLabel) {
+  private void irLibro(JLabel jLabel, int posicion) {
     jLabel.addMouseListener(
         new MouseAdapter() {
           @Override
           public void mouseClicked(MouseEvent e) {
-            libro = collecLibro.find(eq("Titulo", jLabel.getText())).first();
-            intfzInfoLibro.dispose();
-            intfzInfoLibro.iniciar(libro);
+            if (menuUsuario.panelBusqueda.isVisible() == false) {
+              libro = collecLibro.find(eq("Titulo", ultimosTitulos[posicion].toString())).first();
+              intfzInfoLibro.dispose();
+              intfzInfoLibro.iniciar(libro);
+            }
           }
         });
   }
 
-  public void cambioTema(String color) {
-    Temas.cambioTema(color, jPanelA, jLabelA, null, null, null, null, null);
+  private void irLibroT(JLabel jLabel) {
+    jLabel.addMouseListener(
+        new MouseAdapter() {
+          @Override
+          public void mouseClicked(MouseEvent e) {
+            if (menuUsuario.panelBusqueda.isVisible() == false) {
+              libro = collecLibro.find(eq("Titulo", jLabel.getText())).first();
+              intfzInfoLibro.dispose();
+              intfzInfoLibro.iniciar(libro);
+            }
+          }
+        });
   }
 
   public void crearComponentes() {
-    for (JLabel jLabel : jLabelA) {
+    for (JLabel jLabel : lblsPortadas) {
       panel.add(jLabel);
       jLabel.setBorder(BorderFactory.createLineBorder(Color.black));
       jLabel.setHorizontalAlignment(SwingConstants.CENTER);
     }
+    for (JLabel jLabel : lblsTitulos) {
+      panel.add(jLabel);
+      jLabel.setBorder(BorderFactory.createLineBorder(Color.black));
+      jLabel.setHorizontalAlignment(SwingConstants.CENTER);
+    }
+  }
+
+  public void cambioTema(String color) {
+    Temas.cambioTema(color, jPanelA, null, null, null, null, null, null);
   }
 }

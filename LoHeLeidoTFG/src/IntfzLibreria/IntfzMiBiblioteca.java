@@ -22,7 +22,6 @@ public class IntfzMiBiblioteca extends JFrame implements Interfaz {
     setTitle("¿Lo he leído? - Mi IntfzLibreria");
     getContentPane().setLayout(new GridLayout(1, 10));
     MenuUsuario menuUsuario = new MenuUsuario(panel, this);
-    PanelBusqueda panelBusqueda = new PanelBusqueda(panel);
 
     panel.setLayout(null);
 

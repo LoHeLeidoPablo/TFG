@@ -175,6 +175,7 @@ public class IntfzLogin extends JFrame {
           }
         });
     // TODO Relanzar Principal para que aparezca el usuario que acaba de iniciar sesion
+
     /*    menuUsuario = new Libreria.MenuUsuario(intfzPrincipal.panel,intfzPrincipal.jFramePrincipal,null);
        menuUsuario.repaint();
        intfzPrincipal.panel.repaint();

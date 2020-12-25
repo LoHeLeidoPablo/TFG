@@ -5,6 +5,7 @@ import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.result.DeleteResult;
 import org.bson.Document;
 
 import static IntfzLibreria.IntfzLogin.id_Usuario;
@@ -36,9 +37,8 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
   MongoDatabase DDBB = mongoClient.getDatabase("LoHeLeidoDB");
   MongoCollection<Document> collecLibro = DDBB.getCollection("Libro");
   MongoCollection<Document> collecDetLibro = DDBB.getCollection("DetallesPrestamo");
+  MongoCollection<Document> collecDetBiblio = DDBB.getCollection("DetallesBiblioteca");
   MongoCollection<Document> collecUsuario = DDBB.getCollection("Usuario");
-
-  IntfzActualizarLibro intfzActualizarLibro = new IntfzActualizarLibro();
 
   JPanel panel = new JPanel();
   JPanel panelGenero = new JPanel();
@@ -82,7 +82,7 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
   JLabel lblVecesRele = new JLabel("Veces");
 
   String[] estados = {"Sin Añadir", "Leyendo", "Leído", "Abandonado", "Quiero Leer"};
-  JComboBox<String> cbEstados = new JComboBox<String>(estados);
+  JComboBox<String> jcbEstados = new JComboBox<String>(estados);
   JCheckBox jchReleido = new JCheckBox("Releido");
   JSpinner spVecesRele = new JSpinner(new SpinnerNumberModel(0, 0, 99, 1));
   int valMaximoCaps = 50;
@@ -140,7 +140,7 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
   JComponent[] jCompPtecnicoA = {lblISBN, lblCapitulos, lblPaginas, lblColeccion, lblPublicacion};
   JComponent[] jCompPestadoA = {
     lblEstado,
-    cbEstados,
+    jcbEstados,
     jchReleido,
     lblVecesRele,
     spVecesRele,
@@ -160,11 +160,9 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
     this.setResizable(false);
     repeticion();
     cambiarTomo();
-    prestarLibro();
   }
 
   public void iniciar(Document libro) {
-
     getContentPane().setLayout(new GridLayout(1, 15));
     crearComponentes();
     panel.setLayout(null);
@@ -186,14 +184,6 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
       btnUpdateLibro.setBounds(btnPrestamo.getBounds());
       panel.add(btnUpdateLibro);
     }
-
-    btnUpdateLibro.addActionListener(
-        new ActionListener() {
-          @Override
-          public void actionPerformed(ActionEvent e) {
-            // intfzActualizarLibro.iniciar(libro);
-          }
-        });
 
     lblTitlo.setFont(fTitulo);
     lblAutor.setFont(fAutor);
@@ -250,7 +240,7 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
 
     panelEstado.setBounds(panelTecnico.getBounds());
     lblEstado.setBounds(10, 10, 55, 20);
-    cbEstados.setBounds(70, 10, 100, 20);
+    jcbEstados.setBounds(70, 10, 100, 20);
     jchReleido.setBounds(210, 10, 75, 20);
     spVecesRele.setBounds(210, 40, 35, 20);
     lblVecesRele.setBounds(250, 40, 50, 20);
@@ -287,6 +277,10 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
       isbn = libro.getString("ISBN");
       urlPortada = libro.getString("PortadaURL");
       mostrarInfoLibro(libro);
+      prestarLibro(libro);
+      actualizarEstado(libro);
+      actualizar(libro);
+      cancelarEstado();
     }
 
     // Empaquetado, tamaño y visualizazion
@@ -295,7 +289,28 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
     setVisible(true);
   }
 
+  public String loreIpsum() {
+    return " Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris lacinia porttitor libero in commodo. Integer erat metus, condimentum ut mattis quis, pretium sit amet orci. Aenean faucibus eu lacus eget iaculis. Aenean placerat ultrices suscipit. Etiam venenatis nulla ut pharetra scelerisque. Suspendisse scelerisque efficitur elit, id consequat ex tempus at. Nam odio erat, gravida at ante in, pellentesque porttitor ante. Maecenas semper a turpis et euismod.\n"
+        + "Integer sed ultricies sapien. Etiam scelerisque justo at dapibus gravida. Vestibulum sit amet nisi elit. Nam scelerisque magna nibh, feugiat dictum magna blandit at. Praesent dictum mi nec fermentum consequat. Maecenas molestie urna et lorem auctor mollis vitae mollis eros. Phasellus interdum tortor sed venenatis porta. Mauris hendrerit quis neque id aliquet. In a scelerisque urna, in fringilla tortor. Fusce in sodales enim, id iaculis leo. Nulla in laoreet urna, et sodales sem. + \"\\n\"\n"
+        + " \"Integer sed ultricies sapien. Etiam scelerisque justo at dapibus gravida. Vestibulum sit amet nisi elit. Nam scelerisque magna nibh, feugiat dictum magna blandit at. Praesent dictum mi nec fermentum consequat. Maecenas molestie urna et lorem auctor mollis vitae mollis eros. Phasellus interdum tortor sed venenatis porta. Mauris hendrerit quis neque id aliquet. In a scelerisque urna, in fringilla tortor. Fusce in sodales enim, id iaculis leo. Nulla in laoreet urna, et sodales sem. + \"\\n\"\n"
+        + " \"Integer sed ultricies sapien. Etiam scelerisque justo at dapibus gravida. Vestibulum sit amet nisi elit. Nam scelerisque magna nibh, feugiat dictum magna blandit at. Praesent dictum mi nec fermentum consequat. Maecenas molestie urna et lorem auctor mollis vitae mollis eros. Phasellus interdum tortor sed venenatis porta. Mauris hendrerit quis neque id aliquet. In a scelerisque urna, in fringilla tortor. Fusce in sodales enim, id iaculis leo. Nulla in laoreet urna, et sodales sem. + \"\\n\"\n"
+        + " \"Integer sed ultricies sapien. Etiam scelerisque justo at dapibus gravida. Vestibulum sit amet nisi elit. Nam scelerisque magna nibh, feugiat dictum magna blandit at. Praesent dictum mi nec fermentum consequat. Maecenas molestie urna et lorem auctor mollis vitae mollis eros. Phasellus interdum tortor sed venenatis porta. Mauris hendrerit quis neque id aliquet. In a scelerisque urna, in fringilla tortor. Fusce in sodales enim, id iaculis leo. Nulla in laoreet urna, et sodales sem. + \"\\n\"\n"
+        + " \"Integer sed ultricies sapien. Etiam scelerisque justo at dapibus gravida. Vestibulum sit amet nisi elit. Nam scelerisque magna nibh, feugiat dictum magna blandit at. Praesent dictum mi nec fermentum consequat. Maecenas molestie urna et lorem auctor mollis vitae mollis eros. Phasellus interdum tortor sed venenatis porta. Mauris hendrerit quis neque id aliquet. In a scelerisque urna, in fringilla tortor. Fusce in sodales enim, id iaculis leo. Nulla in laoreet urna, et sodales sem. + \"\\n\"\n"
+        + " \"Integer sed ultricies sapien. Etiam scelerisque justo at dapibus gravida. Vestibulum sit amet nisi elit. Nam scelerisque magna nibh, feugiat dictum magna blandit at. Praesent dictum mi nec fermentum consequat. Maecenas molestie urna et lorem auctor mollis vitae mollis eros. Phasellus interdum tortor sed venenatis porta. Mauris hendrerit quis neque id aliquet. In a scelerisque urna, in fringilla tortor. Fusce in sodales enim, id iaculis leo. Nulla in laoreet urna, et sodales sem. + \"\\n\"\n"
+        + " \"Integer sed ultricies sapien. Etiam scelerisque justo at dapibus gravida. Vestibulum sit amet nisi elit. Nam scelerisque magna nibh, feugiat dictum magna blandit at. Praesent dictum mi nec fermentum consequat. Maecenas molestie urna et lorem auctor mollis vitae mollis eros. Phasellus interdum tortor sed venenatis porta. Mauris hendrerit quis neque id aliquet. In a scelerisque urna, in fringilla tortor. Fusce in sodales enim, id iaculis leo. Nulla in laoreet urna, et sodales sem. + \"\\n\"\n"
+        + " \"Integer sed ultricies sapien. Etiam scelerisque justo at dapibus gravida. Vestibulum sit amet nisi elit. Nam scelerisque magna nibh, feugiat dictum magna blandit at. Praesent dictum mi nec fermentum consequat. Maecenas molestie urna et lorem auctor mollis vitae mollis eros. Phasellus interdum tortor sed venenatis porta. Mauris hendrerit quis neque id aliquet. In a scelerisque urna, in fringilla tortor. Fusce in sodales enim, id iaculis leo. Nulla in laoreet urna, et sodales sem. + \"\\n\"\n"
+        + " \"Integer sed ultricies sapien. Etiam scelerisque justo at dapibus gravida. Vestibulum sit amet nisi elit. Nam scelerisque magna nibh, feugiat dictum magna blandit at. Praesent dictum mi nec fermentum consequat. Maecenas molestie urna et lorem auctor mollis vitae mollis eros. Phasellus interdum tortor sed venenatis porta. Mauris hendrerit quis neque id aliquet. In a scelerisque urna, in fringilla tortor. Fusce in sodales enim, id iaculis leo. Nulla in laoreet urna, et sodales sem. + \"\\n\"\n"
+        + " \"Integer sed ultricies sapien. Etiam scelerisque justo at dapibus gravida. Vestibulum sit amet nisi elit. Nam scelerisque magna nibh, feugiat dictum magna blandit at. Praesent dictum mi nec fermentum consequat. Maecenas molestie urna et lorem auctor mollis vitae mollis eros. Phasellus interdum tortor sed venenatis porta. Mauris hendrerit quis neque id aliquet. In a scelerisque urna, in fringilla tortor. Fusce in sodales enim, id iaculis leo. Nulla in laoreet urna, et sodales sem. + \"\\n\"\n"
+        + " \"Integer sed ultricies sapien. Etiam scelerisque justo at dapibus gravida. Vestibulum sit amet nisi elit. Nam scelerisque magna nibh, feugiat dictum magna blandit at. Praesent dictum mi nec fermentum consequat. Maecenas molestie urna et lorem auctor mollis vitae mollis eros. Phasellus interdum tortor sed venenatis porta. Mauris hendrerit quis neque id aliquet. In a scelerisque urna, in fringilla tortor. Fusce in sodales enim, id iaculis leo. Nulla in laoreet urna, et sodales sem. ";
+  }
+
   public void mostrarInfoLibro(Document libro) {
+    Document estado =
+        collecDetBiblio
+            .find(and(eq("Usuario", id_Usuario), eq("Libro", libro)))
+            .projection(
+                include("Estado", "Paginas", "Capitulos", "Nota", "Releido", "VecesReleido"))
+            .first();
     urlPortada = libro.getString("PortadaURL");
     añadirPortada();
     lblISBN.setText("ISBN: " + libro.getString("ISBN"));
@@ -317,6 +332,8 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
       }
     }
     txtASinopsis.setText(libro.getString("Sinopsis"));
+
+    // Pestaña Tecnica
     lblColeccion.setText("Saga: " + libro.getString("Saga") + "  " + libro.getInteger("Tomo"));
     if (libro.getInteger("Capitulos") != null)
       lblCapitulos.setText("Capitulos: " + libro.getInteger("Capitulos"));
@@ -326,6 +343,7 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
       SimpleDateFormat sdf = new SimpleDateFormat("dd - MMMM - yyyy");
       lblPublicacion.setText("Fecha de Publicación: " + sdf.format(libro.getDate("f_publicacion")));
     }
+
     if (libro.getInteger("Capitulos") != null) {
       valMaximoCaps = libro.getInteger("Capitulos");
       spCapL.setModel(new SpinnerNumberModel(0, 0, valMaximoCaps, 1));
@@ -334,6 +352,40 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
       spCapL.setModel(new SpinnerNumberModel(0, 0, 999, 1));
       lblCapTotales.setText("/???");
     }
+    if (libro.getInteger("Paginas") != null) {
+      valMaximoPags = libro.getInteger("Paginas");
+      spPagL.setModel(new SpinnerNumberModel(0, 0, valMaximoPags, 1));
+
+      lblPagTotales.setText("/" + valMaximoPags);
+    } else {
+      spPagL.setModel(new SpinnerNumberModel(0, 0, 999, 1));
+      lblPagTotales.setText("/???");
+    }
+
+    // Pestaña Estado
+    if (estado != null) {
+      jcbEstados.setSelectedItem(estado.getString("Estado"));
+      spCapL.setValue(estado.get("Capitulos"));
+      spPagL.setValue(estado.get("Paginas"));
+      if (estado.getDouble("Nota") != null) {
+        spNota.setValue(estado.getDouble("Nota"));
+      } else {
+        spNota.setValue(0);
+      }
+      jchReleido.setSelected(estado.getBoolean("Releido"));
+      // TODO DA FALLO revisar
+      if (jchReleido.isSelected() == true) spVecesRele.setEnabled(true);
+      spVecesRele.setValue(estado.get("VecesReleido"));
+    } else {
+      jcbEstados.setSelectedIndex(0);
+      spCapL.setValue(0);
+      spPagL.setValue(0);
+      spNota.setValue(0);
+      jchReleido.setSelected(false);
+      spVecesRele.setValue(0);
+    }
+
+    // Panel Colleccion
     dlm.clear();
     MongoCursor<Document> coleccion =
         collecLibro
@@ -349,20 +401,7 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
     }
     listasecuelas.setModel(dlm);
     isbn = libro.getString("ISBN");
-  }
-
-  public void repeticion() {
-    jchReleido.addActionListener(
-        new ActionListener() {
-          @Override
-          public void actionPerformed(ActionEvent e) {
-            if (jchReleido.isSelected() == true) {
-              spVecesRele.setEnabled(true);
-            } else {
-              spVecesRele.setEnabled(false);
-            }
-          }
-        });
+    leido();
   }
 
   public void añadirPortada() {
@@ -386,6 +425,218 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
     }
   }
 
+  public void prestarLibro(Document libro) {
+    btnPrestamo.addActionListener(
+        new ActionListener() {
+          @Override
+          public void actionPerformed(ActionEvent e) {
+            Document usuario = collecUsuario.find(eq("Nombre", id_Usuario)).first();
+            if (usuario.getInteger("NPrestados") < 5) {
+              Calendar calc_fecha = Calendar.getInstance();
+              calc_fecha.setTime(new Date());
+              calc_fecha.set(Calendar.DAY_OF_YEAR, calc_fecha.get(Calendar.DAY_OF_YEAR) + 30);
+              Date f_devolucion = calc_fecha.getTime();
+              try {
+                Document prestamo = new Document();
+                prestamo.put("Usuario", usuario.getString("Nombre"));
+                prestamo.put("Libro", libro);
+                prestamo.put("f_prestamo", new Date());
+                prestamo.put("f_devolucion", f_devolucion);
+                prestamo.put("Prestado", true);
+                Document comproPrestamo = // ComprobarPrestamo
+                    collecDetLibro
+                        .find(
+                            and(
+                                eq("Usuario", prestamo.get("Usuario")),
+                                eq("Libro", prestamo.get("Libro")),
+                                eq("Prestado", true)))
+                        /*.sort(descending("f_prestamo"))*/
+                        .first();
+                if (comproPrestamo == null) {
+                  collecDetLibro.insertOne(prestamo);
+                  collecUsuario.updateOne(
+                      eq("Email", usuario.getString("Email")),
+                      set("NPrestados", usuario.getInteger("NPrestados") + 1));
+                  mensajeEmergente(1);
+                } else {
+                  mensajeEmergente(4);
+                }
+              } catch (Exception exception) {
+                mensajeEmergente(3);
+              }
+
+            } else {
+              mensajeEmergente(2);
+            }
+          }
+        });
+  }
+
+  public void actualizar(Document libro) {
+    btnUpdateLibro.addActionListener(
+        new ActionListener() {
+          @Override
+          public void actionPerformed(ActionEvent e) {
+            // intfzActualizarLibro.iniciar(libro);
+          }
+        });
+  }
+
+  public void leido() {
+    jcbEstados.addActionListener(
+        new ActionListener() {
+          @Override
+          public void actionPerformed(ActionEvent e) {
+            if (jcbEstados.getSelectedItem().equals("Leído")) {
+              spCapL.setValue(valMaximoCaps);
+              spPagL.setValue(valMaximoPags);
+            }
+          }
+        });
+  }
+
+  public void repeticion() {
+    jchReleido.addActionListener(
+        new ActionListener() {
+          @Override
+          public void actionPerformed(ActionEvent e) {
+            if (jchReleido.isSelected() == true) {
+              spVecesRele.setEnabled(true);
+            } else {
+              spVecesRele.setEnabled(false);
+            }
+          }
+        });
+  }
+
+  public void actualizarEstado(Document libro) {
+    btnUpdate.addActionListener(
+        new ActionListener() {
+          @Override
+          public void actionPerformed(ActionEvent e) {
+
+            String isbnLibro = lblISBN.getText().substring(lblISBN.getText().indexOf(" ") + 1);
+            Integer Pags = Integer.parseInt(spPagL.getValue().toString());
+            Integer Caps = Integer.parseInt(spCapL.getValue().toString());
+            Integer Releido = Integer.parseInt(spVecesRele.getValue().toString());
+            Float Nota = Float.parseFloat(spNota.getValue().toString());
+
+            Document libro = collecLibro.find(eq("ISBN", isbnLibro)).first();
+            Document estadoLibro =
+                collecDetBiblio.find(and(eq("Usuario", id_Usuario), eq("Libro", libro))).first();
+            if (estadoLibro != null) {
+              if (jcbEstados.getSelectedItem().toString().equals("Sin Añadir")) {
+                int confirmado =
+                    JOptionPane.showConfirmDialog(
+                        btnUpdate,
+                        "Al dejar el Estado en 'Sin Añadir' esta eliminando este libro de su biblioteca personal. ¿Desea Continuar? ",
+                        "Alerta",
+                        JOptionPane.YES_NO_OPTION);
+
+                if (JOptionPane.OK_OPTION == confirmado) {
+                  DeleteResult delRegistro = collecDetBiblio.deleteOne(estadoLibro);
+                }
+              } else {
+
+                try {
+                  DeleteResult delRegistro = collecDetBiblio.deleteOne(estadoLibro);
+
+                  Document estadoActualizado = new Document();
+                  estadoActualizado.put("Usuario", id_Usuario);
+                  estadoActualizado.put("Libro", libro);
+                  estadoActualizado.put("Estado", jcbEstados.getSelectedItem().toString());
+                  estadoActualizado.put("Paginas", Pags);
+                  estadoActualizado.put("Capitulos", Caps);
+                  if (jchReleido.isSelected()) {
+                    estadoActualizado.put("Releido", true);
+                    estadoActualizado.put("VecesReleido", Releido);
+                  } else {
+                    estadoActualizado.put("Releido", false);
+                    estadoActualizado.put("VecesReleido", null);
+                  }
+                  if (Nota > 0) estadoActualizado.put("Nota", Nota);
+                  collecDetBiblio.insertOne(estadoActualizado);
+
+                  JOptionPane.showMessageDialog(
+                      null,
+                      "Actualizado el Estado del Libro",
+                      " Actualizado ",
+                      JOptionPane.INFORMATION_MESSAGE);
+                } catch (Exception ex) {
+                  JOptionPane.showMessageDialog(
+                      null,
+                      "No Se Ha Podido Actualizar el Estado del Libro",
+                      "Actualición Interrumpida",
+                      JOptionPane.INFORMATION_MESSAGE);
+                }
+              }
+            } else {
+              if (jcbEstados.getSelectedItem().toString().equals("Sin Añadir")) {
+
+              } else {
+                try {
+
+                  Document estado = new Document();
+                  estado.put("Usuario", id_Usuario);
+                  estado.put("Libro", libro);
+                  estado.put("Estado", jcbEstados.getSelectedItem().toString());
+                  estado.put("Paginas", Pags);
+                  estado.put("Capitulos", Caps);
+                  if (jchReleido.isSelected()) {
+                    estado.put("Releido", true);
+                    estado.put("VecesReleido", Releido);
+                  } else {
+                    estado.put("Releido", false);
+                    estado.put("VecesReleido", null);
+                  }
+                  if (Nota > 0) estado.put("Nota", Nota);
+                  collecDetBiblio.insertOne(estado);
+                  mensajeEmergente(5);
+                } catch (Exception ex) {
+                  mensajeEmergente(6);
+                }
+              }
+            }
+          }
+        });
+  }
+
+  public void cancelarEstado() {
+    btnCancelar.addActionListener(
+        new ActionListener() {
+          @Override
+          public void actionPerformed(ActionEvent e) {
+            String isbnLibro = lblISBN.getText().substring(lblISBN.getText().indexOf(" ") + 1);
+            Document libro = collecLibro.find(eq("ISBN", isbnLibro)).first();
+            Document estado =
+                collecDetBiblio.find(and(eq("Usuario", id_Usuario), eq("Libro", libro))).first();
+            if (estado != null) {
+              jcbEstados.setSelectedItem(estado.getString("Estado"));
+              spCapL.setValue(estado.get("Capitulos"));
+              spPagL.setValue(estado.get("Paginas"));
+              if (estado.getDouble("Nota") != null) {
+                spNota.setValue(estado.getDouble("Nota"));
+              } else {
+                spNota.setValue(0);
+              }
+              jchReleido.setSelected(estado.getBoolean("Releido"));
+              if (jchReleido.isSelected() == true) {
+                spVecesRele.setValue(estado.get("VecesReleido"));
+              } else {
+                spVecesRele.setValue(0);
+              }
+            } else {
+              jcbEstados.setSelectedIndex(0);
+              spCapL.setValue(0);
+              spPagL.setValue(0);
+              spNota.setValue(0);
+              jchReleido.setSelected(false);
+              spVecesRele.setValue(0);
+            }
+          }
+        });
+  }
+
   public void cambiarTomo() {
     listasecuelas.addMouseListener(
         new MouseAdapter() {
@@ -406,52 +657,6 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
               }
             }
             return;
-          }
-        });
-  }
-
-  public void prestarLibro() {
-    btnPrestamo.addActionListener(
-        new ActionListener() {
-          @Override
-          public void actionPerformed(ActionEvent e) {
-            Document usuario = collecUsuario.find(eq("Nombre", id_Usuario)).first();
-            if (usuario.getInteger("NPrestados") < 5) {
-              Calendar calc_fecha = Calendar.getInstance();
-              calc_fecha.setTime(new Date());
-              calc_fecha.set(Calendar.DAY_OF_YEAR, calc_fecha.get(Calendar.DAY_OF_YEAR) + 30);
-              Date f_devolucion = calc_fecha.getTime();
-              try {
-                Document prestamo = new Document();
-                prestamo.put("ISBN", isbn);
-                prestamo.put("emailUsu", usuario.getString("Email"));
-                prestamo.put("f_prestamo", new Date());
-                prestamo.put("f_devolucion", f_devolucion);
-                prestamo.put("Prestado", true);
-                Document comproPrestamo =
-                    collecDetLibro
-                        .find(
-                            and(
-                                eq("emailUsu", prestamo.getString("emailUsu")),
-                                eq("ISBN", prestamo.getString("ISBN")),
-                                eq("Prestado", true)))
-                        /*.sort(descending("f_prestamo"))*/
-                        .first();
-                if (comproPrestamo == null) {
-                  collecDetLibro.insertOne(prestamo);
-                  collecUsuario.updateOne(
-                      eq("Email", usuario.getString("Email")),
-                      set("NPrestados", usuario.getInteger("NPrestados") + 1));
-                  mensajeEmergente(1);
-                } else {
-                  mensajeEmergente(4);
-                }
-              } catch (Exception exception) {
-              }
-
-            } else {
-              mensajeEmergente(2);
-            }
           }
         });
   }
@@ -482,21 +687,13 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
           " Ya Prestado ",
           JOptionPane.INFORMATION_MESSAGE);
     }
-  }
-
-  public String loreIpsum() {
-    return " Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris lacinia porttitor libero in commodo. Integer erat metus, condimentum ut mattis quis, pretium sit amet orci. Aenean faucibus eu lacus eget iaculis. Aenean placerat ultrices suscipit. Etiam venenatis nulla ut pharetra scelerisque. Suspendisse scelerisque efficitur elit, id consequat ex tempus at. Nam odio erat, gravida at ante in, pellentesque porttitor ante. Maecenas semper a turpis et euismod.\n"
-        + "Integer sed ultricies sapien. Etiam scelerisque justo at dapibus gravida. Vestibulum sit amet nisi elit. Nam scelerisque magna nibh, feugiat dictum magna blandit at. Praesent dictum mi nec fermentum consequat. Maecenas molestie urna et lorem auctor mollis vitae mollis eros. Phasellus interdum tortor sed venenatis porta. Mauris hendrerit quis neque id aliquet. In a scelerisque urna, in fringilla tortor. Fusce in sodales enim, id iaculis leo. Nulla in laoreet urna, et sodales sem. + \"\\n\"\n"
-        + " \"Integer sed ultricies sapien. Etiam scelerisque justo at dapibus gravida. Vestibulum sit amet nisi elit. Nam scelerisque magna nibh, feugiat dictum magna blandit at. Praesent dictum mi nec fermentum consequat. Maecenas molestie urna et lorem auctor mollis vitae mollis eros. Phasellus interdum tortor sed venenatis porta. Mauris hendrerit quis neque id aliquet. In a scelerisque urna, in fringilla tortor. Fusce in sodales enim, id iaculis leo. Nulla in laoreet urna, et sodales sem. + \"\\n\"\n"
-        + " \"Integer sed ultricies sapien. Etiam scelerisque justo at dapibus gravida. Vestibulum sit amet nisi elit. Nam scelerisque magna nibh, feugiat dictum magna blandit at. Praesent dictum mi nec fermentum consequat. Maecenas molestie urna et lorem auctor mollis vitae mollis eros. Phasellus interdum tortor sed venenatis porta. Mauris hendrerit quis neque id aliquet. In a scelerisque urna, in fringilla tortor. Fusce in sodales enim, id iaculis leo. Nulla in laoreet urna, et sodales sem. + \"\\n\"\n"
-        + " \"Integer sed ultricies sapien. Etiam scelerisque justo at dapibus gravida. Vestibulum sit amet nisi elit. Nam scelerisque magna nibh, feugiat dictum magna blandit at. Praesent dictum mi nec fermentum consequat. Maecenas molestie urna et lorem auctor mollis vitae mollis eros. Phasellus interdum tortor sed venenatis porta. Mauris hendrerit quis neque id aliquet. In a scelerisque urna, in fringilla tortor. Fusce in sodales enim, id iaculis leo. Nulla in laoreet urna, et sodales sem. + \"\\n\"\n"
-        + " \"Integer sed ultricies sapien. Etiam scelerisque justo at dapibus gravida. Vestibulum sit amet nisi elit. Nam scelerisque magna nibh, feugiat dictum magna blandit at. Praesent dictum mi nec fermentum consequat. Maecenas molestie urna et lorem auctor mollis vitae mollis eros. Phasellus interdum tortor sed venenatis porta. Mauris hendrerit quis neque id aliquet. In a scelerisque urna, in fringilla tortor. Fusce in sodales enim, id iaculis leo. Nulla in laoreet urna, et sodales sem. + \"\\n\"\n"
-        + " \"Integer sed ultricies sapien. Etiam scelerisque justo at dapibus gravida. Vestibulum sit amet nisi elit. Nam scelerisque magna nibh, feugiat dictum magna blandit at. Praesent dictum mi nec fermentum consequat. Maecenas molestie urna et lorem auctor mollis vitae mollis eros. Phasellus interdum tortor sed venenatis porta. Mauris hendrerit quis neque id aliquet. In a scelerisque urna, in fringilla tortor. Fusce in sodales enim, id iaculis leo. Nulla in laoreet urna, et sodales sem. + \"\\n\"\n"
-        + " \"Integer sed ultricies sapien. Etiam scelerisque justo at dapibus gravida. Vestibulum sit amet nisi elit. Nam scelerisque magna nibh, feugiat dictum magna blandit at. Praesent dictum mi nec fermentum consequat. Maecenas molestie urna et lorem auctor mollis vitae mollis eros. Phasellus interdum tortor sed venenatis porta. Mauris hendrerit quis neque id aliquet. In a scelerisque urna, in fringilla tortor. Fusce in sodales enim, id iaculis leo. Nulla in laoreet urna, et sodales sem. + \"\\n\"\n"
-        + " \"Integer sed ultricies sapien. Etiam scelerisque justo at dapibus gravida. Vestibulum sit amet nisi elit. Nam scelerisque magna nibh, feugiat dictum magna blandit at. Praesent dictum mi nec fermentum consequat. Maecenas molestie urna et lorem auctor mollis vitae mollis eros. Phasellus interdum tortor sed venenatis porta. Mauris hendrerit quis neque id aliquet. In a scelerisque urna, in fringilla tortor. Fusce in sodales enim, id iaculis leo. Nulla in laoreet urna, et sodales sem. + \"\\n\"\n"
-        + " \"Integer sed ultricies sapien. Etiam scelerisque justo at dapibus gravida. Vestibulum sit amet nisi elit. Nam scelerisque magna nibh, feugiat dictum magna blandit at. Praesent dictum mi nec fermentum consequat. Maecenas molestie urna et lorem auctor mollis vitae mollis eros. Phasellus interdum tortor sed venenatis porta. Mauris hendrerit quis neque id aliquet. In a scelerisque urna, in fringilla tortor. Fusce in sodales enim, id iaculis leo. Nulla in laoreet urna, et sodales sem. + \"\\n\"\n"
-        + " \"Integer sed ultricies sapien. Etiam scelerisque justo at dapibus gravida. Vestibulum sit amet nisi elit. Nam scelerisque magna nibh, feugiat dictum magna blandit at. Praesent dictum mi nec fermentum consequat. Maecenas molestie urna et lorem auctor mollis vitae mollis eros. Phasellus interdum tortor sed venenatis porta. Mauris hendrerit quis neque id aliquet. In a scelerisque urna, in fringilla tortor. Fusce in sodales enim, id iaculis leo. Nulla in laoreet urna, et sodales sem. + \"\\n\"\n"
-        + " \"Integer sed ultricies sapien. Etiam scelerisque justo at dapibus gravida. Vestibulum sit amet nisi elit. Nam scelerisque magna nibh, feugiat dictum magna blandit at. Praesent dictum mi nec fermentum consequat. Maecenas molestie urna et lorem auctor mollis vitae mollis eros. Phasellus interdum tortor sed venenatis porta. Mauris hendrerit quis neque id aliquet. In a scelerisque urna, in fringilla tortor. Fusce in sodales enim, id iaculis leo. Nulla in laoreet urna, et sodales sem. ";
+    if (mensaje == 5) {
+      JOptionPane.showMessageDialog(
+          null, "Libro agregado a la Biblioteca", " Agregdo ", JOptionPane.INFORMATION_MESSAGE);
+    }
+    if (mensaje == 6) {
+      JOptionPane.showMessageDialog(null, "ERROR", " ERROR ", JOptionPane.INFORMATION_MESSAGE);
+    }
   }
 
   public void cambioTema(String color) {

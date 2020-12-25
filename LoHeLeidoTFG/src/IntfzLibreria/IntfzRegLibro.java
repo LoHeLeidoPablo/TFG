@@ -5,10 +5,6 @@ import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import com.toedter.calendar.JDateChooser;
-
-import static IntfzLibreria.IntfzLogin.id_Usuario;
-import static com.mongodb.client.model.Filters.eq;
-
 import org.bson.Document;
 
 import javax.imageio.ImageIO;
@@ -21,6 +17,9 @@ import java.awt.event.ActionListener;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
+
+import static IntfzLibreria.IntfzLogin.id_Usuario;
+import static com.mongodb.client.model.Filters.*;
 
 public class IntfzRegLibro extends JFrame {
 
@@ -269,7 +268,6 @@ public class IntfzRegLibro extends JFrame {
     }
     if (spPaginas.getValue().equals(0) & spCapitulos.getValue().equals(0)) i++;
     if (lblPortada.getIcon() == null) i++;
-    // TODO Mensajes de respuesta en caso de que se haya olvidado de un campo obligatorio
     if (i > 0) {
       mensajeEmergente(10);
       return false;
@@ -308,7 +306,6 @@ public class IntfzRegLibro extends JFrame {
 
     @Override
     public void removeUpdate(DocumentEvent e) {
-      // añadirPortada();
       lblPortada.setIcon(null);
     }
 
@@ -349,7 +346,7 @@ public class IntfzRegLibro extends JFrame {
     } else if (mensaje == 10) {
       JOptionPane.showMessageDialog(
           null,
-          "El ISBN, el Titulo, el Autor y las Paginas o los Capitulos son campos obligatorios",
+          "El ISBN, el Titulo, el Autor, la Portada y las Paginas o los Capitulos son campos obligatorios",
           "Registro Fallido",
           JOptionPane.ERROR_MESSAGE);
     } else

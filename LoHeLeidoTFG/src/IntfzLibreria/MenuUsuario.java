@@ -7,14 +7,17 @@ import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import org.bson.Document;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.font.TextAttribute;
+import java.net.URL;
 import java.util.Map;
 
+import static IntfzLibreria.IntfzLogin.id_Usuario;
 import static com.mongodb.client.model.Filters.*;
 import static com.mongodb.client.model.Sorts.*;
 
@@ -42,6 +45,7 @@ public class MenuUsuario extends JFrame {
 
   JLabel lblTituloProyecto;
   JLabel lblUsuario = new JLabel();
+  JLabel lblPortada = new JLabel();
   JLabel lblRegLibro =
       new JLabel("No encunetra el libro que busca en nuestra Libreria, pulse aqui para añadirlo.");
   JTextField txtBuscadorP;
@@ -142,17 +146,18 @@ public class MenuUsuario extends JFrame {
     btnEscape.setIcon(icono);
 
     scrollPaneResultados.setBounds(
-        50, 75, panelBusqueda.getWidth() - 100, panelBusqueda.getHeight() - 100);
+        50, 75, (panelBusqueda.getWidth() - 100) / 2, panelBusqueda.getHeight() - 100);
     lstCoincidencias.setBounds(
         0, 0, scrollPaneResultados.getWidth(), scrollPaneResultados.getHeight());
     scrollPaneResultados.setBackground(panelBusqueda.getBackground());
+
     lstCoincidencias.setBackground(panelBusqueda.getBackground());
     panelBusqueda.add(scrollPaneResultados);
 
     lblRegLibro.setBounds(200, 475, 600, 20);
     lblRegLibro.setForeground(Color.blue);
     panelBusqueda.add(lblRegLibro);
-    if (IntfzLogin.id_Usuario.equals("Invitado")) {
+    if (id_Usuario.equals("Invitado")) {
       lblRegLibro.setText(
           "Si no encuentras el libro que buscas, unete a 'Lo He Leído', para registrarlo");
       abrirRegUsuario();
@@ -287,8 +292,10 @@ public class MenuUsuario extends JFrame {
           @Override
           public void actionPerformed(ActionEvent e) {
             lblUsuario.setText("Invitado");
-            disposeAll();
-            intfzPrincipal.iniciar();
+            /* disposeAll();
+            intfzPrincipal.iniciar();*/
+            btnLogIn.setVisible(true);
+            btnLog();
           }
         });
 
@@ -405,11 +412,55 @@ public class MenuUsuario extends JFrame {
     lstCoincidencias.setModel(dlm);
   }
 
+  public void añadirPortada() {
+    String elemento = jcbElementos.getSelectedItem().toString();
+    if (elemento.equals("ISBN")) {
+    } else if (elemento.equals("Titulo")) {
+    }
+    lblPortada.setText("Portada no encontrada");
+    lblPortada.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
+    lblPortada.setBounds(
+        scrollPaneResultados.getX() + scrollPaneResultados.getWidth() + 50,
+        scrollPaneResultados.getY(),
+        scrollPaneResultados.getWidth() - 50, // 25
+        scrollPaneResultados.getHeight());
+    panelBusqueda.add(lblPortada);
+    String enlace = lstCoincidencias.getSelectedValue().toString();
+    Document portadaLibro = collecLibro.find(eq(elemento, enlace)).first();
+    String urlPortada = portadaLibro.getString("PortadaURL");
+    try {
+      URL url = new URL(urlPortada);
+      Image portada = ImageIO.read(url);
+      ImageIcon portadaIco = new ImageIcon(portada);
+      Icon icono =
+          new ImageIcon(
+              portadaIco
+                  .getImage()
+                  .getScaledInstance(
+                      lblPortada.getWidth(), lblPortada.getHeight(), Image.SCALE_DEFAULT));
+      lblPortada.setIcon(icono);
+      lblPortada.setBorder(null);
+      repaint();
+
+    } catch (Exception ex) {
+      JOptionPane.showMessageDialog(
+          null, "Lo Sentimos, no es posible mostrar la portada de este ejemplar" + urlPortada);
+    }
+  }
+
   public void mostrarLibro() {
+    // TODO Funciona pero debe seleccionarse con el raton, usar las fleachas no cambia la portad
     lstCoincidencias.addMouseListener(
         new MouseAdapter() {
           public void mouseClicked(MouseEvent evt) {
             lstCoincidencias = (JList) evt.getSource();
+            if (!jcbElementos.getSelectedItem().equals("Autor")) {
+              añadirPortada();
+            } else {
+              lblPortada.setIcon(null);
+              lblPortada.setText("Este elemento no tiene Portada");
+              lblPortada.setHorizontalAlignment(SwingConstants.CENTER);
+            }
             if (evt.getClickCount() == 2) {
               String enlace = lstCoincidencias.getSelectedValue().toString();
               Document libro = collecLibro.find(eq(elemento, enlace)).first();
@@ -423,11 +474,11 @@ public class MenuUsuario extends JFrame {
                 infoLibro.iniciar(libro);
               }
               if (elemento.equals("Autor")) {
-                // TODO VOY A TENER UNA VENTANA DE INFO AUTOR
+                Document libroAutor = collecLibro.find(eq(elemento, enlace)).first();
               }
               if (elemento.equals("Saga")) {
                 infoLibro.iniciar(libro);
-                infoLibro.tabbed.setSelectedIndex(getComponentCount());
+                infoLibro.tabbed.setSelectedIndex(infoLibro.tabbed.getTabCount() - 1);
               }
             }
           }

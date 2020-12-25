@@ -373,7 +373,6 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
         spNota.setValue(0);
       }
       jchReleido.setSelected(estado.getBoolean("Releido"));
-      // TODO DA FALLO revisar
       if (jchReleido.isSelected() == true) spVecesRele.setEnabled(true);
       spVecesRele.setValue(estado.get("VecesReleido"));
     } else {
@@ -426,6 +425,7 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
   }
 
   public void prestarLibro(Document libro) {
+    //TODO RELANZAR o REPINTAR CUENTA
     btnPrestamo.addActionListener(
         new ActionListener() {
           @Override
@@ -477,6 +477,7 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
         new ActionListener() {
           @Override
           public void actionPerformed(ActionEvent e) {
+            dispose(); //Cerrar la ventana y reabrirla con los datos cambiados o repintar
             // intfzActualizarLibro.iniciar(libro);
           }
         });
@@ -510,6 +511,7 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
   }
 
   public void actualizarEstado(Document libro) {
+     //TODO RELANZAR o REPINTAR BIBLIOTECA
     btnUpdate.addActionListener(
         new ActionListener() {
           @Override

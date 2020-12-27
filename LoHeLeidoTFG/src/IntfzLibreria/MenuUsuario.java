@@ -257,6 +257,7 @@ public class MenuUsuario extends JFrame {
             panelBusqueda.setVisible(false);
             txtBuscador.setVisible(true);
             txtBuscadorP.setText("");
+            lblPortada.setVisible(false);
           }
         });
 
@@ -394,7 +395,7 @@ public class MenuUsuario extends JFrame {
           .toLowerCase()
           .contains(txtBuscadorP.getText().toLowerCase())) {
         if (elemento.equals("ISBN")) {
-          dato = libroColec.getString(elemento) + " - " + libroColec.getString("Titulo");
+          dato = libroColec.getString(elemento);
           dlm.addElement(dato);
         } else if (elemento.equals("Saga") || elemento.equals("Autor")) {
           dato = libroColec.getString(elemento);
@@ -414,9 +415,6 @@ public class MenuUsuario extends JFrame {
 
   public void añadirPortada() {
     String elemento = jcbElementos.getSelectedItem().toString();
-    if (elemento.equals("ISBN")) {
-    } else if (elemento.equals("Titulo")) {
-    }
     lblPortada.setText("Portada no encontrada");
     lblPortada.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));
     lblPortada.setBounds(
@@ -455,6 +453,7 @@ public class MenuUsuario extends JFrame {
           public void mouseClicked(MouseEvent evt) {
             lstCoincidencias = (JList) evt.getSource();
             if (!jcbElementos.getSelectedItem().equals("Autor")) {
+              lblPortada.setVisible(true);
               añadirPortada();
             } else {
               lblPortada.setIcon(null);

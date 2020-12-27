@@ -10,6 +10,10 @@ import org.bson.Document;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.net.URL;
 import java.util.Calendar;
 import java.util.Date;
@@ -28,9 +32,12 @@ public class IntfzMiCuenta extends JFrame implements Interfaz {
   MongoClient mongoClient = new MongoClient(uri);
   MongoDatabase DDBB = mongoClient.getDatabase("LoHeLeidoDB");
   MongoCollection<Document> collecLibro = DDBB.getCollection("Libro");
-  MongoCollection<Document> collecDetLibro = DDBB.getCollection("DetallesPrestamo");
+  MongoCollection<Document> collecDetPrestamo = DDBB.getCollection("DetallesPrestamo");
   MongoCollection<Document> collecDetBiblio = DDBB.getCollection("DetallesBiblioteca");
   MongoCollection<Document> collecUsuario = DDBB.getCollection("Usuario");
+
+  MenuUsuario menuUsuario;
+  IntfzInfoLibro intfzInfoLibro = new IntfzInfoLibro();
 
   JPanel panel = new JPanel();
   JPanel panelPrestamo = new JPanel();
@@ -79,30 +86,59 @@ public class IntfzMiCuenta extends JFrame implements Interfaz {
   JLabel[] lblPortada = {lblPortada1, lblPortada2, lblPortada3, lblPortada4, lblPortada5};
   JLabel[] lblTitulo = {lblTitulo1, lblTitulo2, lblTitulo3, lblTitulo4, lblTitulo5};
   JLabel[] lblAutor = {lblAutor1, lblAutor2, lblAutor3, lblAutor4, lblAutor5};
-  JLabel[] lblSaga = {lblSaga1, lblSaga2, lblTitulo3, lblSaga4, lblSaga5};
+  JLabel[] lblSaga = {lblSaga1, lblSaga2, lblSaga3, lblSaga4, lblSaga5};
   JLabel[] lblRestante = {
     lblDiasRestantes1, lblDiasRestantes2, lblDiasRestantes3, lblDiasRestantes4, lblDiasRestantes5
   };
   JButton[] btnDevolver = {btnDevolver1, btnDevolver2, btnDevolver3, btnDevolver4, btnDevolver5};
 
   JLabel lblAntiguedad = new JLabel("Fecha de Registro");
+  Font antiguedad = new Font(lblAntiguedad.getFont().getFamily(), 0, 25);
 
-  int conteoLeyendo = 10;
-  int conteoLeido = 242;
-  int conteoAbandonado = 14;
-  int conteoQuieroLeer = 147;
-  int conteoTotal = conteoLeyendo + conteoLeido + conteoAbandonado + conteoQuieroLeer;
+  JLabel[] jLabelsA = {
+    lblPortada1,
+    lblPortada2,
+    lblPortada3,
+    lblPortada3,
+    lblPortada4,
+    lblPortada5,
+    lblTitulo1,
+    lblTitulo2,
+    lblTitulo3,
+    lblTitulo4,
+    lblTitulo5,
+    lblAutor1,
+    lblAutor2,
+    lblAutor3,
+    lblAutor4,
+    lblAutor4,
+    lblAutor5,
+    lblSaga1,
+    lblSaga2,
+    lblSaga2,
+    lblSaga3,
+    lblSaga3,
+    lblSaga4,
+    lblSaga5,
+    lblAntiguedad
+  };
+
+  int conteoLeyendo = 0;
+  int conteoLeido = 0;
+  int conteoAbandonado = 0;
+  int conteoQuieroLeer = 0;
+  int conteoTotal = 0;
 
   JLabel lblVerde = new JLabel();
   JLabel lblAzul = new JLabel();
   JLabel lblRojo = new JLabel();
   JLabel lblGris = new JLabel();
 
-  JLabel lblLeyendo = new JLabel("Leyendo: " + conteoLeyendo);
-  JLabel lblLeidos = new JLabel("Leidos: " + conteoLeido);
-  JLabel lblAbandonados = new JLabel("Abandonados: " + conteoAbandonado);
-  JLabel lblQuieroLeer = new JLabel("Quiero Leer: " + conteoQuieroLeer);
-  JLabel lblTotalGuardados = new JLabel("Libros Guardados: " + conteoTotal);
+  JLabel lblLeyendo = new JLabel();
+  JLabel lblLeidos = new JLabel();
+  JLabel lblAbandonados = new JLabel();
+  JLabel lblQuieroLeer = new JLabel();
+  JLabel lblTotalGuardados = new JLabel();
 
   JLabel lblCapitulosTotales = new JLabel("Capitulos: " + 100.000);
   JLabel lblColecciones = new JLabel("Colecciones: " + 1.000);
@@ -135,7 +171,7 @@ public class IntfzMiCuenta extends JFrame implements Interfaz {
   public void iniciar() {
     setTitle("¿Lo he leído? - Mi Cuenta");
     getContentPane().setLayout(new GridLayout(1, 10));
-    MenuUsuario menuUsuario = new MenuUsuario(panel, this);
+    menuUsuario = new MenuUsuario(panel, this);
 
     panel.setLayout(null);
     panelPrestamo.setLayout(new GridLayout(5, 1));
@@ -146,6 +182,12 @@ public class IntfzMiCuenta extends JFrame implements Interfaz {
     panelPrestamo4.setLayout(null);
     panelPrestamo5.setLayout(null);
     crearComponentes();
+
+    irLibroPrestado(panelPrestamo1, 0);
+    irLibroPrestado(panelPrestamo2, 1);
+    irLibroPrestado(panelPrestamo3, 2);
+    irLibroPrestado(panelPrestamo4, 3);
+    irLibroPrestado(panelPrestamo5, 4);
     getContentPane().add(panel);
 
     // Empaquetado, tamaño y visualizazion
@@ -167,6 +209,7 @@ public class IntfzMiCuenta extends JFrame implements Interfaz {
     for (JLabel jLabel : lblPortada) {
       jLabel.setBounds(10, 10, 100, 150);
       jLabel.setBorder(BorderFactory.createLineBorder(Color.black));
+      jLabel.setHorizontalAlignment(SwingConstants.CENTER);
     }
 
     for (JLabel jLabel : lblTitulo) {
@@ -232,10 +275,9 @@ public class IntfzMiCuenta extends JFrame implements Interfaz {
   }
 
   private void mostrarPrestamo() {
-    // TODO No Funciona
     MongoCursor<Document> prestamosUsuario =
-        collecDetLibro
-            .find(and(eq("Nombre", id_Usuario), eq("Prestado", true)))
+        collecDetPrestamo
+            .find(and(eq("Usuario", id_Usuario), eq("Prestado", true)))
             .sort(ascending())
             .iterator();
     int pos = -1;
@@ -244,11 +286,12 @@ public class IntfzMiCuenta extends JFrame implements Interfaz {
       Document prestamo = prestamosUsuario.next();
       pos++;
       Document libro = (Document) prestamo.get("Libro");
-      dias = calculoDias(libro.getDate("f_devolucion"));
+      // TODO No Funciona.AHora solo falla esta linea -->
+      //  dias = calculoDias(libro.getDate("f_devolucion"));
       añadirPortada(libro.getString("PortadaURL"), pos);
       lblTitulo[pos].setText(libro.getString("Titulo"));
       lblAutor[pos].setText(libro.getString("Autor"));
-      lblSaga[pos].setText(libro.getString("Saga"));
+      lblSaga[pos].setText(libro.getString("Saga") + " " + libro.getInteger("Tomo"));
       lblRestante[pos].setText("Te Quedan " + dias + " dias");
       if (dias > 19) {
         lblRestante[pos].setForeground(Color.GREEN);
@@ -283,7 +326,35 @@ public class IntfzMiCuenta extends JFrame implements Interfaz {
     }
   }
 
-  public void devolverPrestamo(JButton jButton) {}
+  public void devolverPrestamo(JButton jButton) {
+    jButton.addActionListener(
+        new ActionListener() {
+          @Override
+          public void actionPerformed(ActionEvent e) {
+            // TODO Preguntar como saber a que boton me estoy refiriendo
+          }
+        });
+  }
+
+  public void irLibroPrestado(JPanel jPanel, int posicion) {
+    jPanel.addMouseListener(
+        new MouseAdapter() {
+          @Override
+          public void mouseClicked(MouseEvent e) {
+            if (menuUsuario.panelBusqueda.isVisible() == false) {
+              Document libro =
+                  collecLibro.find(eq("Titulo", lblTitulo[posicion].getText().toString())).first();
+              if (lblPortada[posicion].getIcon() == null) {
+                JOptionPane.showMessageDialog(
+                    null, "Este Panel no contiene ningun prestamo", "Sin Perstamo", 0);
+              } else {
+                intfzInfoLibro.dispose();
+                intfzInfoLibro.iniciar(libro);
+              }
+            }
+          }
+        });
+  }
 
   private void crearComponentesEstadistica() {
     panelEstadisticas.setBounds(550, 100, 1000, 850);
@@ -294,17 +365,17 @@ public class IntfzMiCuenta extends JFrame implements Interfaz {
   }
 
   private void tiempoRegistrado() {
-    lblAntiguedad.setBounds(100, 200, 500, 25);
+    lblAntiguedad.setBounds(550, 30, 450, 30);
     panelEstadisticas.add(lblAntiguedad);
+    lblAntiguedad.setFont(antiguedad);
     Document tiempoRegistro =
         collecUsuario.find(eq("Nombre", id_Usuario)).projection(include("fCreacionCuenta")).first();
     lblAntiguedad.setText("Antiguedad en Lo he Leído: X días ");
 
     if (tiempoRegistro != null) {
       Date regUSuario = tiempoRegistro.getDate("fCreacionCuenta");
-      System.out.println(regUSuario);
       int dias = Math.abs(calculoDias(regUSuario));
-      lblAntiguedad.setText("Antiguedad en Lo he Leído: " + dias + " días ");
+      lblAntiguedad.setText("Antiguedad en 'Lo he Leído': " + dias + " días ");
 
       if (dias > 365) {
         int anios = dias / 365;
@@ -358,6 +429,36 @@ public class IntfzMiCuenta extends JFrame implements Interfaz {
     lblGris.setOpaque(true);
     lblGris.setBorder(BorderFactory.createLineBorder(lblGris.getBackground(), 2));
 
+    // TODO NO RECOGE LOS DOCUMENTOS
+    MongoCursor<Document> countLeyendo =
+        collecDetBiblio.find(and(eq("Estado", "Leyendo"), eq("Usuario", id_Usuario))).iterator();
+    while (countLeyendo.hasNext()) {
+      Document coley = countLeyendo.next();
+      conteoLeyendo++;
+    }
+    MongoCursor<Document> countLeido =
+        collecDetBiblio.find(and(eq("Estado", "Leído"), eq("Usuario", id_Usuario))).iterator();
+    while (countLeido.hasNext()) {
+      Document colei = countLeido.next();
+      conteoLeido++;
+    }
+    MongoCursor<Document> countAbandonado =
+        collecDetBiblio.find(and(eq("Estado", "Abandonado"), eq("Usuario", id_Usuario))).iterator();
+    while (countAbandonado.hasNext()) {
+      Document coab = countAbandonado.next();
+      conteoAbandonado++;
+    }
+    MongoCursor<Document> countQuiero =
+        collecDetBiblio
+            .find(and(eq("Estado", "Quiero Leer"), eq("Usuario", id_Usuario)))
+            .iterator();
+    while (countQuiero.hasNext()) {
+      Document coqui = countQuiero.next();
+      conteoQuieroLeer++;
+    }
+
+    conteoTotal = conteoLeyendo + conteoLeido + conteoAbandonado + conteoQuieroLeer;
+
     if (conteoTotal == 0) {
     } else {
       double vLV = ((((double) conteoLeyendo * 100) / conteoTotal) * 500) / 100;
@@ -381,6 +482,12 @@ public class IntfzMiCuenta extends JFrame implements Interfaz {
     panelEstadisticas.add(lblRojo);
     panelEstadisticas.add(lblGris);
 
+    lblLeyendo.setText("Leyendo: " + conteoLeyendo);
+    lblLeidos.setText("Leidos: " + conteoLeido);
+    lblAbandonados.setText("Abandonados: " + conteoAbandonado);
+    lblQuieroLeer.setText("Quiero Leer: " + conteoQuieroLeer);
+    lblTotalGuardados.setText("Libros Guardados: " + conteoTotal);
+
     lblLeyendo.setBounds(50, 80, 200, 20);
     lblLeyendo.setForeground(lblVerde.getBackground());
     panelEstadisticas.add(lblLeyendo);
@@ -396,6 +503,6 @@ public class IntfzMiCuenta extends JFrame implements Interfaz {
   }
 
   public void cambioTema(String color) {
-    Temas.cambioTema(color, jPanelA, null, null, null, null, null, null);
+    Temas.cambioTema(color, jPanelA, jLabelsA, null, btnDevolver, null, null, null);
   }
 }

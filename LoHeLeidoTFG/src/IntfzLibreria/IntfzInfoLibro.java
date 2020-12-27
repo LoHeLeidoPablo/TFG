@@ -374,7 +374,8 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
       }
       jchReleido.setSelected(estado.getBoolean("Releido"));
       if (jchReleido.isSelected() == true) spVecesRele.setEnabled(true);
-      spVecesRele.setValue(estado.get("VecesReleido"));
+      if(estado.get("VecesReleido") !=null){
+      spVecesRele.setValue(estado.get("VecesReleido"));}else{ spVecesRele.setValue(0);}
     } else {
       jcbEstados.setSelectedIndex(0);
       spCapL.setValue(0);
@@ -478,7 +479,8 @@ public class IntfzInfoLibro extends JFrame implements Interfaz {
           @Override
           public void actionPerformed(ActionEvent e) {
             dispose(); //Cerrar la ventana y reabrirla con los datos cambiados o repintar
-            // intfzActualizarLibro.iniciar(libro);
+            IntfzActLibro intfzActLibro = new IntfzActLibro();
+            intfzActLibro.iniciar(libro);
           }
         });
   }

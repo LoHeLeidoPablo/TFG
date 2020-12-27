@@ -14,6 +14,8 @@ import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
@@ -116,6 +118,7 @@ public class IntfzRegLibro extends JFrame {
     crearComponentes();
     registrarLibro();
     insertarP();
+    vaciarURL();
 
     panel.setLayout(null);
     panelGenero.setLayout(null);
@@ -333,6 +336,16 @@ public class IntfzRegLibro extends JFrame {
       JOptionPane.showMessageDialog(
           null, "Error: No se ha podido abrir la imagen de la URL => " + txtURL.getText());
     }
+  }
+
+  public void vaciarURL() {
+    lblPortadaURL.addMouseListener(
+        new MouseAdapter() {
+          @Override
+          public void mouseClicked(MouseEvent e) {
+            txtURL.setText("");
+          }
+        });
   }
 
   public void mensajeEmergente(int mensaje) {

@@ -14,6 +14,8 @@ import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
@@ -37,9 +39,9 @@ public class IntfzRegLibro extends JFrame {
   private JPanel panelGenero = new JPanel();
 
   private JLabel lblPortada = new JLabel("Portada:");
-  private JLabel lblISBN = new JLabel("ISBN");
-  private JLabel lblTitulo = new JLabel("Titulo");
-  private JLabel lblAutor = new JLabel("Autor");
+  private JLabel lblISBN = new JLabel("ISBN*");
+  private JLabel lblTitulo = new JLabel("Titulo*");
+  private JLabel lblAutor = new JLabel("Autor*");
   private JLabel lblColeccion = new JLabel("Saga");
   private JLabel lblNColeccion = new JLabel("Tomo");
   private JLabel lblPaginas = new JLabel("Paginas");
@@ -47,7 +49,7 @@ public class IntfzRegLibro extends JFrame {
   private JLabel lblPublicacion = new JLabel("F. Publicación");
   private JLabel lblGeneros = new JLabel("Genero");
   private JLabel lblResumen = new JLabel("Resumen");
-  private JLabel lblPortadaURL = new JLabel("URL de la Portada");
+  private JLabel lblPortadaURL = new JLabel("URL de la Portada*");
 
   private JTextField txtISBN = new JTextField();
   private JTextField txtTitulo = new JTextField();
@@ -116,6 +118,7 @@ public class IntfzRegLibro extends JFrame {
     crearComponentes();
     registrarLibro();
     insertarP();
+    vaciarURL();
 
     panel.setLayout(null);
     panelGenero.setLayout(null);
@@ -333,6 +336,16 @@ public class IntfzRegLibro extends JFrame {
       JOptionPane.showMessageDialog(
           null, "Error: No se ha podido abrir la imagen de la URL => " + txtURL.getText());
     }
+  }
+
+  public void vaciarURL() {
+    lblPortadaURL.addMouseListener(
+        new MouseAdapter() {
+          @Override
+          public void mouseClicked(MouseEvent e) {
+            txtURL.setText("");
+          }
+        });
   }
 
   public void mensajeEmergente(int mensaje) {
